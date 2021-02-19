@@ -1,0 +1,96 @@
+html {
+   font-size: 100%;
+ }
+ 
+ .searchbar {
+    width: 35rem!important;
+ }
+ 
+ .searchbar::placeholder{
+    font-weight: 300;
+ }
+ 
+ .results img {
+    height:10rem;
+    width:20%;
+    margin-bottom: 20px;  
+    padding-top: 10px;
+    float: left;
+    margin-right: 30px;
+ }
+ 
+ .file {
+    height: 25vh;
+ }
+ 
+ .content {
+  margin-left: 30px;
+  
+ }
+ 
+ .content h5 {
+    font-size: 1rem;
+ }
+ 
+ #title_link {
+    font-size: 1.6rem;
+    font-weight: bold;
+    margin-top: -5px;
+ }
+ 
+ .material_type {
+    color: gray;
+    font-size: 0.75rem;
+    padding: 3px;
+    border: rgb(224, 224, 224) 2px solid;
+    border-radius: 14px;
+ }
+ 
+ .date {
+    margin-top: 37px;
+ }
+ 
+ 
+ 
+ @media (max-width: 992px) {
+    .container.m {
+       width: 90%!important;
+    }
+    .searchbar {
+       width: 15em!important;
+    }
+    
+ }
+ 
+ @media (max-width: 454px) {
+    .searchbar {
+       width: 10em!important;
+    }
+ }
+ 
+ @media (max-width: 790px) {
+    html{
+       font-size: 80%;
+    }
+ 
+    .content {
+       margin-left: 0px;
+    }
+ 
+    .date {
+       display: inline-block;
+       width: 21rem;
+       margin-top: 0px;
+    }
+    
+ }
+ 
+ @media (min-width: 992px) {
+    .login:hover {
+       border-bottom: 2px solid #0069D9;
+       margin-bottom: -3px;
+    }
+ }
+ 
+ 
+ 
