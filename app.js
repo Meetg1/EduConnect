@@ -73,7 +73,8 @@ app.post("/register", async (req, res) => {
     const user = new User({ username: username, email: email, fullname: fullname, university: university });
     const registedUser = await User.register(user, password);
     console.log(registedUser);
-    res.render("signup.ejs");
+    //res.send("Registered Successfully");
+    res.redirect("/signup");
   } catch (e) {
     res.send(e.message);
     console.log(e);
