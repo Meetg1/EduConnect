@@ -69,10 +69,11 @@ app.post("/register", async (req, res) => {
     return res.redirect("/signup");
   }
   try {
-    const { username, email } = req.body;
-    const user = new User({ username: username, email: email });
+    const { fullname, username, email, university } = req.body;
+    const user = new User({ username: username, email: email, fullname: fullname, university: university });
     const registedUser = await User.register(user, password);
     console.log(registedUser);
+    res.render("signup.ejs");
   } catch (e) {
     res.send(e.message);
     console.log(e);

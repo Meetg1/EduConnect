@@ -30,19 +30,26 @@
          </div>
          <div class="user signupBx">
             <div class="formBx">
-               <form action="/register" method="POST">
+               <form id="regForm" action="/register" method="POST">
                   <h2>Create an account</h2>
-                  <input type="text" name="username" placeholder="Username" />
-                  <input type="email" name="email" placeholder="Email Address" />
-                  <input type="password" name="password" placeholder="Create Password" />
-                  <input type="password" name="cpwd" placeholder="Confirm Password" />
-                  <input type="submit" value="Sign Up" />
+                  
+                     <input type="text" name="fullname" placeholder="Full name" />
+                     <input type="email" name="email" placeholder="Email Address" />
+                     <input type="text" name="university" placeholder="University" />
+                  
+                  
+                     <input type="text" name="username" placeholder="Username" />                
+                     <input type="password" name="password" placeholder="Create Password" />
+                     <input type="password" name="cpwd" placeholder="Confirm Password" />
+                  
+                     <input type="submit" value="Submit" />
                   <p onclick="">
                      Already have an account ?
                      <a href="#" onclick="toggleForm(); changeImg2();">Sign in.</a>
                   </p>
                </form>
             </div>
+
             <div class="imgBx"><img src="https://i.ytimg.com/vi/4l6J5jhRgos/maxresdefault.jpg" alt=""
                   id="sign_in_img" /></div>
          </div>
@@ -69,4 +76,6 @@
          document.getElementById('section1').style.backgroundImage =
             "url('https://i.pinimg.com/originals/0d/af/b7/0dafb7928a99a9cb552a941895a6e586.jpg')"
       };
+
+
    </script>
