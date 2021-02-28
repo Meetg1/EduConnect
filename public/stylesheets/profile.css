@@ -1,3 +1,31 @@
+html {
+  font-size: 100%;
+}
+
+.searchbar {
+   width: 35rem!important;
+}
+
+.searchbar::placeholder{
+   font-weight: 300;
+}
+
+.uploadBox, .pointBox, .upvoteBox{
+  border: 1px solid #e6e9ec;
+  border-radius: 3px;
+  margin-left: 2rem;
+  margin-bottom: 2rem;
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+.numBox {
+  display: flex;
+  justify-content: space-around;
+}
+
+
+
 .jumbotron {
    padding-top: 15px;
    padding-bottom: 15px;
@@ -39,9 +67,11 @@
  .profile-stat-count {
    margin-left: 1.7em;
  }
+
  .univ {
    margin-left: 4.1em;
    font-size: 1.1em;
+   color: #0069D9;
  }
  .box {
    background-color: white;
@@ -78,20 +108,22 @@
    background-color: #f2f3f5;
    height: 4px;
  }
+
+
  .format {
    color: #4e657e;
    font-size: 20px;
-   float: left;
    font-family: Verdana, Geneva, Tahoma, sans-serif;
+   margin-left: 1.3rem;;
  }
  .bbox {
    background-color: white;
-   width: 400px;
+   /* width: 400px; */
    border: 1px solid #e6e9ec;
    border-radius: 3px;
    padding: 20px;
-   height: 50px;
-   float: left;
+   /* height: 50px; */
+   /* float: left; */
    margin-top: 10px;
    border-bottom: 1px solid #e6e9ec;
    position: absolute;
@@ -370,3 +402,49 @@
    color: darkgoldenrod;
  }
  
+
+ @media (max-width: 992px) {
+  .searchbar {
+     width: 15em!important;
+  }
+  
+}
+
+@media (max-width: 454px) {
+  .searchbar {
+     width: 10em!important;
+  }
+  .box {
+    display: none;
+  }
+  .profile-user-name {
+    font-size: 2rem;
+  }
+  
+  .univ {
+    margin-left: 2.3em;
+    
+  }
+
+  .profile-stat-count {
+    margin-left: 0;
+  }
+
+}
+
+@media (max-width: 790px) {
+  html{
+     font-size: 80%;
+  }
+  .jumbotron {
+    height: 230px;
+  }
+  
+}
+
+@media (min-width: 992px) {
+  .login:hover {
+     border-bottom: 2px solid #0069D9;
+     margin-bottom: -3px;
+  }
+}
