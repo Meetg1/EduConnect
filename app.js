@@ -6,12 +6,20 @@ const mongoose = require("mongoose");
 const User = require("./models/user.js");
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
+const session = require("express-session");
 
 app.engine("ejs", ejsMate);
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
-app.use(express.static(path.join(__dirname, "public")));
-app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, "public"))); //for serving static files
+app.use(express.urlencoded({ extended: true })); //for parsing form data
+
+const sessionConfig = {
+  secret: "#sms#",
+  resave: false,
+  saveUninitialized: true,
+};
+app.use(session(sessionConfig));
 
 //====================DATABASE CONNECTION==========================
 const dbUrl = "mongodb://localhost:27017/test";
@@ -70,7 +78,12 @@ app.post("/register", async (req, res) => {
   }
   try {
     const { fullname, username, email, university } = req.body;
-    const user = new User({ username: username, email: email, fullname: fullname, university: university });
+    const user = new User({
+      username: username,
+      email: email,
+      fullname: fullname,
+      university: university,
+    });
     const registedUser = await User.register(user, password);
     console.log(registedUser);
     //res.send("Registered Successfully");
