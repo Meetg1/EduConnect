@@ -113,7 +113,7 @@ app.post(
   "/login",
   passport.authenticate("local", { failureRedirect: "/signup" }),
   (req, res) => {
-    res.send("LOGIN SUCCESSFUL");
+    res.redirect(`/users/${req.user.id}`);
   }
 );
 

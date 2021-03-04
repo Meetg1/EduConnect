@@ -434,6 +434,10 @@ html {
   .univ {
     margin-left: 2.3em;
   }
+  
+  /* .content {
+    margin-left: 10px;
+  } */
 
   .profile-stat-count {
     margin-left: 0;
@@ -462,19 +466,13 @@ html {
   height: 25vh;
 }
 
-.img {
-  height: 140px;
-  width: 20%;
-  margin-top: 50px;
+img {
+  height:10rem;
+  width:20%;
+  margin-bottom: 20px;  
+  padding-top: 10px;
   float: left;
-  margin-left: 5px;
-}
-.img1 {
-  height: 140px;
-  width: 20%;
-  margin-top: 0px;
-  float: left;
-  margin-left: 5px;
+  margin-right: 30px;
 }
 
 #title_link {
@@ -500,8 +498,7 @@ html {
   font-size: 0.75rem;
 }
 .content {
-  margin-left: 260px;
-  padding-top: 45px;
+  padding-top: 7px;
 }
 
 .content h5 {
