@@ -6,9 +6,14 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  email: {
+  isAdmin: {
+    type: Boolean,
+    default: false,
+  },
+  profilePhoto: {
     type: String,
-    required: true,
+    default:
+      "https://image.shutterstock.com/image-vector/profile-picture-vector-600w-404138239.jpg",
   },
   university: {
     type: String,

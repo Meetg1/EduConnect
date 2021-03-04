@@ -15,15 +15,15 @@ app.set("views", path.join(__dirname, "views"));
 app.use(express.static(path.join(__dirname, "public"))); //for serving static files
 app.use(express.urlencoded({ extended: true })); //for parsing form data
 
-app.use(session({
-  secret: "#sms#",
-  resave: true,
-  saveUninitialized: true 
-}));
+app.use(
+  session({
+    secret: "#sms#",
+    resave: true,
+    saveUninitialized: true,
+  })
+);
 
 app.use(flash());
-
-
 
 //====================DATABASE CONNECTION==========================
 const dbUrl = "mongodb://localhost:27017/test";
@@ -50,27 +50,23 @@ passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 //===================================================================
 
-<<<<<<< Updated upstream
-=======
-<<<<<<< HEAD
 //Express Messages Middle ware
 app.use(require("connect-flash")());
-app.use(function(req, res, next ){
+app.use(function (req, res, next) {
+  res.locals.currentUser = req.user; //giving access of loggedIn user to every templates(in views dir)
   res.locals.messages = require("express-messages")(req, res);
   next();
 });
-=======
->>>>>>> Stashed changes
+// =======
+// >>>>>>> Stashed changes
 const isLoggedIn = (req, res, next) => {
   if (!req.isAuthenticated()) {
+    req.flash("danger", "Please Log In First!");
     return res.redirect("/signup");
   }
   next();
 };
-<<<<<<< Updated upstream
-=======
->>>>>>> 7813f896817c8ccc1fd749705f68562dd62bd39f
->>>>>>> Stashed changes
+// >>>>>>> Stashed changes
 
 app.get("/results", (req, res) => {
   res.render("results.ejs");
@@ -84,10 +80,10 @@ app.get("/users/:user_id", isLoggedIn, async (req, res) => {
   try {
     foundUser = await User.findById(req.params.user_id);
     if (!foundUser) {
-      //flash msg no such user found
+      req.flash("danger", "No such user found");
       return res.redirect("/results");
     }
-    res.render("profile.ejs", { user: foundUser });
+    res.render("profile.ejs");
   } catch (error) {
     console.error(error);
   }
@@ -109,9 +105,8 @@ app.post("/register", async (req, res) => {
   const { password, cpwd } = req.body;
   if (password != cpwd) {
     req.flash("danger", "Passwords do not match");
-    console.log("Passwords do not match");
-    //return res.redirect("/signup");
-  } 
+    return res.redirect("/signup");
+  }
   try {
     const { fullname, username, email, university } = req.body;
     const user = new User({
@@ -126,45 +121,26 @@ app.post("/register", async (req, res) => {
     req.flash("success", "You are now registered");
 
     res.redirect("/signup");
-    
   } catch (e) {
-    res.send(e.message);
-    console.log(e);
+    req.flash("danger", "That username is already taken!");
+    return res.redirect("/signup");
   }
 });
 
-<<<<<<< HEAD
-app.post(
-  "/login",
-  passport.authenticate("local", { failureRedirect: "/signup" }),
-  (req, res) => {
-    res.redirect(`/users/${req.user.id}`);
-  }
-);
-=======
-app.post("/login", function(req,res,next){
-  passport.authenticate("local", { 
+app.post("/login", (req, res, next) => {
+  passport.authenticate("local", {
     failureRedirect: "/signup",
-    successRedirect: "/profile",
-    failureFlash: true
-     })(req, res, next);
+    successRedirect: "/results",
+    failureFlash: true,
+  })(req, res, next);
 });
 
-/*  
 //Logout
-router.get("/logout",function(req, res){
+app.get("/logout", (req, res) => {
   req.logout();
   req.flash("success", "You are logged out");
   res.redirect("/signup");
 });
-*/
->>>>>>> 152fef81e939700fc21876cadd172bef02f00185
-
-app.get("/logout", (req, res) => {
-  req.logout();
-  res.redirect("/results");
-});
-
 
 const port = 3000;
 
