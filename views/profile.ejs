@@ -13,27 +13,28 @@
   <div class="jumbotron jumbotron-fluid">
     <div class="container">
       <div class="profile-user-settings">
-        <h1 class="profile-user-name">&nbsp; &nbsp; &nbsp;SHUBH GOSALIA</h1>
+        <h1 class="profile-user-name">&nbsp; &nbsp; &nbsp;<%= user.fullname %></h1>
         <div class="box">
-          <h1 class="size">Total Points <strong class="black">&nbsp;&nbsp; 70</strong></h1>
+          <h1 class="size">Total Points <strong class="black">&nbsp; <%= user.points %></strong></h1>
           <div class="lightline">
             <div style="width:0%">
             </div>
           </div>
-          <h1 class="size_down">Total Upvotes<strong class="black">179</strong></h1>
+          <h1 class="size_down">Total Upvotes<strong class="black"><%= user.upvotes %></strong></h1>
           <div class="lightline">
             <div style="width:0%">
             </div>
           </div>
         </div>
         <br>
-        <div class="univ" href="#">KJ Somaiya College Of Engineering</div>
+        <div class="univ" href="#"><%= user.university %></div>
+        <div class="univ" href="#"><%= user.email %></div>
       </div>
       <div class="profile-stats">
         <ul>
           <br>
-          <li><span class="profile-stat-count"><strong>164</strong></span> uploads</li>
-          <li><span class="profile-stat-count"><strong>188</strong></span> followers</li>
+          <li><span class="profile-stat-count"><strong><%= user.upvotes %></strong></span> uploads</li>
+          <li><span class="profile-stat-count"><strong><%= user.followers %></strong></span> followers</li>
         </ul>
       </div>
     </div>
@@ -70,7 +71,7 @@
             </svg></h4>
           <hr>
           <div class="numBox">
-            <div class="num"><span><strong>65</strong></span></div>
+            <div class="num"><span><strong><%= user.points %></strong></span></div>
           </div>
           <div class="numBox">
             <div class="num ml-2 light">total</div>
@@ -84,7 +85,7 @@
             </svg></h4>
           <hr>
           <div class="numBox">
-            <div class="num"><span><strong>65</strong></span></div>
+            <div class="num"><span><strong><%= user.upvotes %></strong></span></div>
           </div>
           <div class="numBox">
             <div class="num ml-2 light">total</div>

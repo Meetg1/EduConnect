@@ -369,7 +369,7 @@ html {
 }
 .star2 {
   margin-top: -2px;
-  color: maroon;
+  color: rgb(253, 208, 208);
   height: 35px;
   margin-left: 0px;
 }
@@ -439,6 +439,8 @@ html {
     margin-left: 0;
   }
 }
+
+
 
 @media (max-width: 790px) {
   html {

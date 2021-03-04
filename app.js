@@ -61,8 +61,17 @@ app.get("/upload", isLoggedIn, (req, res) => {
   res.render("upload.ejs");
 });
 
-app.get("/profile", isLoggedIn, (req, res) => {
-  res.render("profile.ejs");
+app.get("/users/:user_id", isLoggedIn, async (req, res) => {
+  try {
+    foundUser = await User.findById(req.params.user_id);
+    if (!foundUser) {
+      //flash msg no such user found
+      return res.redirect("/results");
+    }
+    res.render("profile.ejs", { user: foundUser });
+  } catch (error) {
+    console.error(error);
+  }
 });
 
 app.get("/landing", (req, res) => {
