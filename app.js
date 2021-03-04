@@ -46,15 +46,22 @@ passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 //===================================================================
 
+const isLoggedIn = (req, res, next) => {
+  if (!req.isAuthenticated()) {
+    return res.redirect("/signup");
+  }
+  next();
+};
+
 app.get("/results", (req, res) => {
   res.render("results.ejs");
 });
 
-app.get("/upload", (req, res) => {
+app.get("/upload", isLoggedIn, (req, res) => {
   res.render("upload.ejs");
 });
 
-app.get("/profile", (req, res) => {
+app.get("/profile", isLoggedIn, (req, res) => {
   res.render("profile.ejs");
 });
 
@@ -86,7 +93,6 @@ app.post("/register", async (req, res) => {
     });
     const registedUser = await User.register(user, password);
     console.log(registedUser);
-    //res.send("Registered Successfully");
     res.redirect("/signup");
   } catch (e) {
     res.send(e.message);
@@ -101,6 +107,11 @@ app.post(
     res.send("LOGIN SUCCESSFUL");
   }
 );
+
+app.get("/logout", (req, res) => {
+  req.logout();
+  res.redirect("/results");
+});
 
 const port = 3000;
 
