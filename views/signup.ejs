@@ -8,14 +8,16 @@
 <body>
 
    <%- include('partials/navbar')%>
-
+    <%- messages('messages', locals) %>
    <section id='section1'>
+  
       <div class="container2">
          <div class="user signinBx">
             <div class="imgBx"><img
                   src="https://www.chrishazemusic.com/wp-content/uploads/2018/02/Website-Background-scaled.jpg"
                   id="sign_up_img" alt="" class="sign_in_img" /></div>
             <div class="formBx">
+
                <form action="/login" method="POST">
                   <h2>Sign In</h2>
                   <input type="text" name="username" placeholder="Username" />
