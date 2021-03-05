@@ -8,6 +8,7 @@ const passport = require("passport");
 const LocalStrategy = require("passport-local");
 const session = require("express-session");
 const flash = require("connect-flash");
+const multer = require("multer");
 
 app.engine("ejs", ejsMate);
 app.set("view engine", "ejs");
@@ -57,8 +58,7 @@ app.use(function (req, res, next) {
   res.locals.messages = require("express-messages")(req, res);
   next();
 });
-// =======
-// >>>>>>> Stashed changes
+
 const isLoggedIn = (req, res, next) => {
   if (!req.isAuthenticated()) {
     req.flash("danger", "Please Log In First!");
@@ -66,7 +66,30 @@ const isLoggedIn = (req, res, next) => {
   }
   next();
 };
-// >>>>>>> Stashed changes
+
+//=======================MULTER=====================================
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, path.join(__dirname, "uploads"));
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.originalname);
+  },
+});
+
+var upload = multer({ storage: storage });
+
+app.post("/uploadfile", upload.single("file"), (req, res, next) => {
+  const file = req.file;
+  console.log(file);
+  if (!file) {
+    const error = new Error("Please upload a file");
+    error.httpStatusCode = 400;
+    return next(error);
+  }
+  res.send(file);
+});
+//============================================================
 
 app.get("/results", (req, res) => {
   res.render("results.ejs");
