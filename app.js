@@ -9,6 +9,7 @@ const LocalStrategy = require("passport-local");
 const session = require("express-session");
 const flash = require("connect-flash");
 const multer = require("multer");
+const { uploadToDrive, picToDrive } = require("./driveApi.js");
 
 app.engine("ejs", ejsMate);
 app.set("view engine", "ejs");
@@ -78,10 +79,22 @@ const storage = multer.diskStorage({
 });
 
 var upload = multer({ storage: storage });
-
+var file;
 app.post("/uploadfile", upload.single("file"), (req, res, next) => {
-  const file = req.file;
-  console.log(file);
+  file = req.file;
+  // console.log(file);
+  if (!file) {
+    const error = new Error("Please upload a file");
+    error.httpStatusCode = 400;
+    return next(error);
+  }
+  res.send(file);
+});
+
+var previewPics = [];
+app.post("/uploadpics", upload.single("file"), (req, res, next) => {
+  previewPics.push(req.file);
+  // console.log(file);
   if (!file) {
     const error = new Error("Please upload a file");
     error.httpStatusCode = 400;
@@ -91,11 +104,35 @@ app.post("/uploadfile", upload.single("file"), (req, res, next) => {
 });
 //============================================================
 
+app.post("/upload", async (req, res) => {
+  console.log(req.body);
+  try {
+    const uploadedFile = await uploadToDrive(file.originalname, file.mimetype);
+    if (uploadedFile) {
+      console.log(uploadedFile);
+    }
+    for (let i = 0; i < previewPics.length; i++) {
+      await picToDrive(previewPics[i].originalname, previewPics[i].mimetype);
+    }
+
+    // const uploadedPic = await picToDrive(
+    //   previewPics[1].originalname,
+    //   previewPics[1].mimetype
+    // );
+    // const uploadedPic = await picToDrive(
+    //   previewPics[2].originalname,
+    //   previewPics[2].mimetype
+    // );
+  } catch (error) {
+    console.log(error);
+  }
+});
+
 app.get("/results", (req, res) => {
   res.render("results.ejs");
 });
 
-app.get("/upload", isLoggedIn, (req, res) => {
+app.get("/upload", (req, res) => {
   res.render("upload.ejs");
 });
 

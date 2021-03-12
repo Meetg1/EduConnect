@@ -61,4 +61,28 @@ const uploadToDrive = async (fileName, mime_type) => {
   }
 };
 
+const picToDrive = async (picName, mime_type) => {
+  const folderId = "1J2lVVPUgNXGi2CXXb1V53aHY_ucKpvgZ";
+  const fileMetadata = {
+    name: picName,
+    parents: [folderId],
+  };
+  const media = {
+    mimeType: mime_type,
+    body: fs.createReadStream(`./uploads/${picName}`),
+  };
+
+  try {
+    const uploadedFile = await drive.files.create({
+      resource: fileMetadata,
+      media: media,
+      fields: "id",
+    });
+    return uploadedFile;
+  } catch (error) {
+    return error;
+  }
+};
+
 module.exports.uploadToDrive = uploadToDrive;
+module.exports.picToDrive = picToDrive;
