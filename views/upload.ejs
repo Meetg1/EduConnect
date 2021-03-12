@@ -44,17 +44,22 @@
                         <fieldset>
                             <div class="step">
                                 <p class="mt-4">Step 1: Choose a course for which you'd like to upload documents</p>
-                                <form action="">
+                                <form id="form1">
                                     <div class="form-group row">
                                         <label for="uni" class="col-form-label" id="uni">University:</label>
                                         <div class="col-sm-10">
-                                            <input type="text" placeholder="Select university" class="form-control">
+                                            <input type="text" placeholder="Select university" class="form-control" name="university">
                                         </div>
                                     </div>
                                     <div class="form-group row">
                                         <label for="course" class="col-form-label" id="course">Course:</label>
                                         <div class="col-sm-10">
-                                            <input type="text" placeholder="Select course" class="form-control">
+                                            <select class="custom-select form-control" name="course">
+                                                <option selected>Select a course/degree</option>
+                                                <option value="Bcom">Bcom</option>
+                                                <option value="Btech">Btech</option>
+                                                <option value="Bms">Bms</option>
+                                              </select>
                                         </div>
                                     </div>
                                 </form>
@@ -62,10 +67,8 @@
                             <input type="button" name="next-step" class="next-step btn btn-primary" value="Next Step" />
                         </fieldset>
                         <fieldset>
-                            <div class="step">
-                                <div class="step">
-                                    <form action="/uploadfile" class="dropzone" id="my-awesome-dropzone"></form>
-                                </div>
+                            <div class="step">                                
+                                <form action="/uploadfile" class="dropzone" id="my-awesome-dropzone"></form>                                
                             </div>
                             <input type="button" name="next-step" class="next-step btn btn-primary" value="Next Step" />
                             <input type="button" name="previous-step" class="previous-step btn btn-outline-primary"
@@ -73,90 +76,53 @@
                         </fieldset>
                         <fieldset>
                             <p class="mt-4">Step 2: Please enter the following details: </p>
-                            <form action="">
+                            <form id="form2">
                                 <div class="form-group row">
                                     <label for="uni" class="col-form-label" id="uni">Title:</label>
                                     <div class="col-sm-10">
-                                        <input type="text" placeholder="Select title" class="form-control">
+                                        <input type="text" placeholder="Select title" class="form-control" name="title">
                                     </div>
                                 </div>
                                 <div class="form-group row">
                                     <label for="course" class="col-form-label" id="course">Category:</label>
                                     <div class="col-sm-10">
-                                        <input type="text" placeholder="Select category" class="form-control">
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <label for="uni" class="col-form-label" id="uni">Branch:</label>
-                                    <div class="col-sm-10">
-                                        <input type="text" placeholder="Select" class="form-control">
+                                        <select class="custom-select form-control" name="category">
+                                            <option selected>Select a category</option>
+                                            <option value="Lecture Notes">Lecture Notes</option>
+                                            <option value="Question Paper">Question Paper</option>
+                                            <option value="Assignment">Assignment</option>
+                                          </select>
                                     </div>
                                 </div>
                                 <div class="form-group row">
                                     <label for="uni" class="col-form-label" id="uni">Topic:</label>
                                     <div class="col-sm-10 col-lg-5">
-                                        <input type="text" placeholder="Select" class="form-control">
+                                        <input type="text" placeholder="Select" class="form-control" name="topic">
                                     </div>
                                     <label for="uni" class="col-form-label" id="uni">Number of pages:</label>
                                     <div class="col-sm-10 col-lg-3">
-                                        <input type="text" placeholder="Select" class="form-control">
+                                        <input type="text" placeholder="Select" class="form-control" name="num_pages">
                                     </div>
                                 </div>
                                 <div class="form-group row">
                                     <label for="uni" class="col-form-label" id="uni">Description:</label>
                                     <div class="col-sm-10 text-left">
-                                        <textarea name="" id="" cols="0" rows="5"></textarea>
+                                        <textarea name="description" id="" cols="0" rows="5"></textarea>
                                     </div>
                                 </div>
+                                
                                 <div class="form-group row">
-                                    <label for="uni" class="col-form-label" id="uni">Preview Pictures:</label>
-                                    <div class="col-sm-10 col-lg-4">
-                                        <input type="file" name="file" class="form-control">
-                                    </div>
-                                    <div class="col-sm-10 col-lg-6">
-                                        <p>Please upload 3 preview images, including index if possible</p>
-                                    </div>
-
+                                   <label>Preview Pictures: </label> &nbsp;&nbsp;Please upload 3 preview images, including index if possible                         
                                 </div>
                             </form>
+                            <div class="step">                                
+                                <form action="/uploadpics" class="dropzone d1" id="my-awesome-dropzone"></form>                                
+                            </div>                          
 
-
-                            <input type="button" name="next-step" class="next-step btn btn-primary" value="Finish" />
+                            
+                            <button type="submit" form="form2" class="next-step btn btn-primary"> Finish</button>
                             <input type="button" name="previous-step" class="previous-step btn btn-outline-primary"
                                 value="Previous Step" />
-                        </fieldset>
-                        <fieldset>
-                            <div class="step">
-                                <div class="success-box">
-                                    <img src="http://clipart-library.com/images/pioda5AbT.png" alt=""
-                                        class="upload-img">
-                                    <div class="pt-3">
-                                        <h3>Successful!</h3>
-                                        <p>Thank you! Your file has been uploaded.</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <h3 class="text-left ml-5 text-success">You earned:</h3>
-                            <div class="earned">
-                                <div class="earned-card">
-                                    <h4 class="text-warning"> <svg xmlns="http://www.w3.org/2000/svg" width="16"
-                                            height="16" fill="currentColor" class="bi bi-lightning-fill"
-                                            viewBox="0 0 16 16">
-                                            <path
-                                                d="M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.09z" />
-                                        </svg> 20 points!</h4>
-                                    <p>Points can be used to download other uploaded documents.</p>
-                                </div>
-                                <div class="earned-card">
-                                    <h4 class="text-pink"> <svg xmlns="http://www.w3.org/2000/svg" width="16"
-                                            height="16" fill="currentColor" class="bi bi-heart-fill"
-                                            viewBox="0 0 16 16">
-                                            <path fill-rule="evenodd"
-                                                d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z" />
-                                        </svg> Karma!</h4>
-                                    <p>Your documents will help students all over the world.</p>
-                                </div>
-                            </div>
                         </fieldset>
                     </div>
                 </div>
@@ -164,11 +130,21 @@
         </div>
     </div>
 
+
+  
+        
+        
+        
+       
+    
+
     <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-Piv4xVNRyMGpqkS2by6br4gNJ7DXjqk09RmUpJ8jgGtD7zP9yug3goQfGII0yAns" crossorigin="anonymous">
     </script>
     <script src="/javascripts/upload.js"></script>
+
+     
 
 </body>
 

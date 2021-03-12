@@ -66,8 +66,17 @@ $(document).ready(function () {
     percent = percent.toFixed();
     $(".progress-bar").css("width", percent + "%");
   }
+});
 
-  $(".submit").click(function () {
-    return false;
+$("#form2").submit(function () {
+  var action = $(this).attr("action");
+  $.ajax({
+    url: "/upload",
+    type: "POST",
+    data: $("#form1, #form2").serialize(),
+    success: function () {
+      window.location.replace(action);
+    },
   });
+  return false;
 });

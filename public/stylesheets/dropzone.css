@@ -246,6 +246,11 @@
    padding-top: 10%;
 }
 
+.d1 {   
+   height: 20vh;
+   padding-top: 3.6%;   
+}
+
 .dropzone.dz-clickable {
    cursor: pointer;
 }

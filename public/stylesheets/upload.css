@@ -138,7 +138,7 @@ label {
 }
 
 .form-control {
-	width: 95%;
+	
 	background-color: #f5f9fc;
 }
 
@@ -173,6 +173,9 @@ textarea {
 @media (max-width: 454px) {
    .searchbar {
       width: 10em!important;
+   }
+   label {
+	   margin-left: 15px;
    }
 }
 
