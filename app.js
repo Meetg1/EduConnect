@@ -4,6 +4,7 @@ const path = require("path");
 const ejsMate = require("ejs-mate");
 const mongoose = require("mongoose");
 const User = require("./models/user.js");
+const Document = require("./models/Document.js");
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
 const session = require("express-session");
@@ -82,7 +83,7 @@ var upload = multer({ storage: storage });
 var file;
 app.post("/uploadfile", upload.single("file"), (req, res, next) => {
   file = req.file;
-  // console.log(file);
+  console.log(file);
   if (!file) {
     const error = new Error("Please upload a file");
     error.httpStatusCode = 400;
@@ -115,6 +116,24 @@ app.post("/upload", async (req, res) => {
       await picToDrive(previewPics[i].originalname, previewPics[i].mimetype);
     }
 
+    const{ university, course, title, category, topic, pages, description } = req.body;
+    const doc = new Document({
+      university: university,
+      course: course,
+      title: title,
+      category: category,
+      topic: topic,
+      pages: pages,
+      description: description
+    });
+    doc.save(function(err){
+      if(err)
+        console.log(err);
+      else
+        console.log(doc);
+    });
+    
+    
     // const uploadedPic = await picToDrive(
     //   previewPics[1].originalname,
     //   previewPics[1].mimetype
@@ -123,6 +142,7 @@ app.post("/upload", async (req, res) => {
     //   previewPics[2].originalname,
     //   previewPics[2].mimetype
     // );
+
   } catch (error) {
     console.log(error);
   }
