@@ -93,6 +93,7 @@ app.post("/uploadfile", upload.single("file"), (req, res, next) => {
 });
 
 var previewPics = [];
+var previewPicIds = []
 app.post("/uploadpics", upload.single("file"), (req, res, next) => {
   previewPics.push(req.file);
   // console.log(file);
@@ -105,26 +106,38 @@ app.post("/uploadpics", upload.single("file"), (req, res, next) => {
 });
 //============================================================
 
-app.post("/upload", async (req, res) => {
+app.post("/upload", isLoggedIn, async (req, res) => {
   console.log(req.body);
   try {
     const uploadedFile = await uploadToDrive(file.originalname, file.mimetype);
     if (uploadedFile) {
-      console.log(uploadedFile);
+      console.log(uploadedFile.data.id);
     }
     for (let i = 0; i < previewPics.length; i++) {
-      await picToDrive(previewPics[i].originalname, previewPics[i].mimetype);
+      const uploadedPic = await picToDrive(previewPics[i].originalname, previewPics[i].mimetype);
+      previewPicIds.push(uploadedPic.data.id)
     }
 
-    const{ university, course, title, category, topic, pages, description } = req.body;
+    const{ university, course, title, category, date, topic, num_pages, description } = req.body;
+    const driveId = uploadedFile.data.id;
+    const uploader = {
+      id: req.user._id,
+      username: req.user.username
+    }
+
+
     const doc = new Document({
       university: university,
       course: course,
       title: title,
       category: category,
+      date : date,
       topic: topic,
-      pages: pages,
-      description: description
+      num_pages: num_pages,
+      description: description,
+      uploader: uploader,
+      driveId: driveId,
+      previewPics : previewPicIds
     });
     doc.save(function(err){
       if(err)
@@ -152,7 +165,7 @@ app.get("/results", (req, res) => {
   res.render("results.ejs");
 });
 
-app.get("/upload", (req, res) => {
+app.get("/upload", isLoggedIn, (req, res) => {
   res.render("upload.ejs");
 });
 
