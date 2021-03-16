@@ -86,16 +86,27 @@ html {
   color: #0069d9;
 }
 .box {
-  background-color: white;
   width: 250px;
-  border: 1px solid #e6e9ec;
-  border-radius: 3px;
   padding: 20px;
   height: 120px;
   float: right;
-  margin-top: 10px;
-  border-bottom: 1px solid #e6e9ec;
+  margin-top: -150px;
+  margin-right: 150px;
 }
+.wrapper {
+  padding: 100px;
+}
+
+.image--cover {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  margin: 20px;
+
+  object-fit: cover;
+  object-position: center right;
+}
+
 .size {
   text-transform: uppercase;
   color: #4e657e;
@@ -434,7 +445,7 @@ html {
   .univ {
     margin-left: 2.3em;
   }
-  
+
   /* .content {
     margin-left: 10px;
   } */
@@ -443,8 +454,6 @@ html {
     margin-left: 0;
   }
 }
-
-
 
 @media (max-width: 790px) {
   html {
@@ -467,9 +476,9 @@ html {
 }
 
 .img {
-  height:10rem;
-  width:20%;
-  margin-bottom: 20px;  
+  height: 10rem;
+  width: 20%;
+  margin-bottom: 20px;
   padding-top: 10px;
   float: left;
   margin-right: 30px;

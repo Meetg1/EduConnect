@@ -9,24 +9,13 @@
 <body>
 
   <%- include('partials/navbar')%>
-
-  
-  
-
     <div class="jumbotron jumbotron-fluid">
       <div class="container">
         <div class="profile-user-settings">
           <h1 class="profile-user-name">&nbsp; &nbsp; &nbsp;<%= currentUser.fullname %></h1>
-          <div class="box">
-            <h1 class="size">Total Points <strong class="black">&nbsp; <%= currentUser.points %></strong></h1>
-            <div class="lightline">
-              <div style="width:0%">
-              </div>
-            </div>
-            <h1 class="size_down">Total Upvotes<strong class="black"><%= currentUser.upvotes %></strong></h1>
-            <div class="lightline">
-              <div style="width:0%">
-              </div>
+          <div class="box row">
+            <div class="wrapper col-md-2 col-6">
+              <img src="https://i2.cdn.turner.com/cnnnext/dam/assets/140926165711-john-sutter-profile-image-large-169.jpg" alt="" class="image--cover" />
             </div>
           </div>
           <br>
@@ -43,7 +32,6 @@
       </div>
     </div>
     <div class="container">
-
       <section class="statFigures mt-5">
         <h1 class="format">Stats & Figures</h1>
         <div class="statBox row mt-5">
@@ -63,7 +51,7 @@
               <div class="num ml-4 light"> notes</div>
               <div class="num ml-5 light"> papers</div>
               <div class="num ml-3 light"> presentations</div>
-            </div>
+            </div>    
 
           </div>
           <div class="pointBox col-md-2 col-6">
