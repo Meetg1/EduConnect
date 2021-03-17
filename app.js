@@ -12,7 +12,9 @@ const session = require("express-session");
 const flash = require("connect-flash");
 const multer = require("multer");
 const { uploadToDrive, picToDrive } = require("./driveApi.js");
+const expressValidator = require('express-validator');
 
+app.use(express.json());
 app.engine("ejs", ejsMate);
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
@@ -62,6 +64,24 @@ app.use(function (req, res, next) {
   res.locals.messages = require("express-messages")(req, res);
   next();
 });
+
+// Express Validator Middleware
+app.use(expressValidator({
+  errorFormatter: function(param, msg, value){
+    var namespace = param.split("."),
+    root = namespace.shift(),
+    formParam = root;
+
+    while(namespace.length){
+      formParam += "[" + namespace.shift() + "]";
+    }
+    return {
+      param : formParam,
+      msg : msg,
+      value : value
+    };
+  }
+})); 
 
 const isLoggedIn = (req, res, next) => {
   if (!req.isAuthenticated()) {
@@ -197,14 +217,24 @@ app.get("/single_material", (req, res) => {
 });
 
 app.post("/register", async (req, res) => {
-  const { password, cpwd } = req.body;
-  if (password != cpwd) {
-    req.flash("danger", "Passwords do not match!");
-    return res.redirect("/signup");
-  }
   try {
-    const { fullname, username, email, university } = req.body;
-    const user = new User({
+    const { fullname, username, email, university, password, cpwd } = req.body;
+
+    req.checkBody("fullname", "Name is required").notEmpty();
+    req.checkBody("university", "University is required").notEmpty();
+    req.checkBody("email", "Enter a valid Email-id").isEmail();
+    req.checkBody("password", "Password is required").notEmpty();
+    req.checkBody("cpwd", "Passwords do not match").equals(req.body.password);
+
+    let errors = req.validationErrors();
+    if(errors){
+      console.log(errors);
+     res.render("signup.ejs",{
+       errors: errors
+     });
+    }
+    else{
+      const user = new User({
       username: username,
       email: email,
       fullname: fullname,
@@ -212,10 +242,13 @@ app.post("/register", async (req, res) => {
     });
     const registedUser = await User.register(user, password);
     console.log(registedUser);
-  
-    req.flash("success", "You are now registered!");
-
+    //res.send("Registered Successfully");
+    req.flash("success", "You are now registered");
     res.redirect("/signup");
+
+    }
+
+    
   } catch (e) {
     req.flash("danger", "That email is already registered!");
     return res.redirect("/signup");
