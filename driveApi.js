@@ -15,26 +15,26 @@ const drive = google.drive({
   auth,
 });
 
- drive.files.list({}, (err, res) => {
-  if (err) throw err;
-  const files = res.data.files;
-if (files.length) {
-    files.map((file) => {
-console.log(file);
-});
-  } else {
-     console.log("No files found");
-   }
-});
+//  drive.files.list({}, (err, res) => {
+//   if (err) throw err;
+//   const files = res.data.files;
+// if (files.length) {
+//     files.map((file) => {
+// console.log(file);
+// });
+//   } else {
+//      console.log("No files found");
+//    }
+// });
 
- (async function () {
-  let res = await drive.files.list({
-pageSize: 5,
-     fields: "*",
-orderBy: "createdTime desc",
-   });
-  console.log(res.data);
-})();
+//  (async function () {
+//   let res = await drive.files.list({
+// pageSize: 5,
+//      fields: "*",
+// orderBy: "createdTime desc",
+//    });
+//   console.log(res.data);
+// })();
 
 //================uploading file to a folder
 

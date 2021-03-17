@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const path = require("path");
 const ejsMate = require("ejs-mate");
+const courses = require("./courses")
 const mongoose = require("mongoose");
 const User = require("./models/user.js");
 const Document = require("./models/Document.js");
@@ -17,6 +18,7 @@ app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.use(express.static(path.join(__dirname, "public"))); //for serving static files
 app.use(express.urlencoded({ extended: true })); //for parsing form data
+app.use(flash());
 
 app.use(
   session({
@@ -26,7 +28,7 @@ app.use(
   })
 );
 
-app.use(flash());
+
 
 //====================DATABASE CONNECTION==========================
 const dbUrl = "mongodb://localhost:27017/test";
@@ -166,7 +168,7 @@ app.get("/results", (req, res) => {
 });
 
 app.get("/upload", isLoggedIn, (req, res) => {
-  res.render("upload.ejs");
+  res.render("upload.ejs", {courses});
 });
 
 app.get("/users/:user_id", isLoggedIn, async (req, res) => {
@@ -197,7 +199,7 @@ app.get("/single_material", (req, res) => {
 app.post("/register", async (req, res) => {
   const { password, cpwd } = req.body;
   if (password != cpwd) {
-    req.flash("danger", "Passwords do not match");
+    req.flash("danger", "Passwords do not match!");
     return res.redirect("/signup");
   }
   try {
@@ -210,12 +212,12 @@ app.post("/register", async (req, res) => {
     });
     const registedUser = await User.register(user, password);
     console.log(registedUser);
-    //res.send("Registered Successfully");
-    req.flash("success", "You are now registered");
+  
+    req.flash("success", "You are now registered!");
 
     res.redirect("/signup");
   } catch (e) {
-    req.flash("danger", "That username is already taken!");
+    req.flash("danger", "That email is already registered!");
     return res.redirect("/signup");
   }
 });
@@ -225,13 +227,14 @@ app.post("/login", (req, res, next) => {
     failureRedirect: "/signup",
     successRedirect: "/results",
     failureFlash: true,
+    successFlash:"Welcome to EduConnect " + req.body.username + "!",
   })(req, res, next);
 });
 
 //Logout
 app.get("/logout", (req, res) => {
   req.logout();
-  req.flash("success", "You are logged out");
+  req.flash("success", "Logged Out Successfully.");
   res.redirect("/signup");
 });
 

@@ -56,9 +56,9 @@
                                         <div class="col-sm-10">
                                             <select class="custom-select form-control" name="course">
                                                 <option selected>Select a course/degree</option>
-                                                <option value="Bcom">Bcom</option>
-                                                <option value="Btech">Btech</option>
-                                                <option value="Bms">Bms</option>
+                                                <% for( let i = 0; i < courses.length; i++ ) { %>
+                                                    <option value="<%=courses[i]%>"><%=courses[i]%></option>
+                                                <% } %>
                                               </select>
                                         </div>
                                     </div>
