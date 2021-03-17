@@ -231,8 +231,14 @@ app.get("/signup", (req, res) => {
   res.render("signup.ejs");
 });
 
-app.get("/single_material", (req, res) => {
-  res.render("single_material.ejs");
+
+
+app.get("/single_material/:document_id", function(req, res){
+    Document.findById(req.params.document_id, function(err, docs){
+      res.render("single_material.ejs",{
+          docs:docs
+      });  
+    });  
 });
 
 app.post("/register", async (req, res) => {
