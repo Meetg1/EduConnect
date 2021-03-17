@@ -189,9 +189,20 @@ app.post("/upload", isLoggedIn, async (req, res) => {
   }
 });
 
-app.get("/results", (req, res) => {
-  res.render("results.ejs");
+app.get("/results", function(req, res){
+  Document.find({},function(err, docs){
+    if(err){
+      console.log(err);
+    }else{
+      console.log(docs);
+      res.render("results.ejs",{
+        docs: docs
+
+      });
+    }
+  });  
 });
+
 
 app.get("/upload", isLoggedIn, (req, res) => {
   res.render("upload.ejs", {
