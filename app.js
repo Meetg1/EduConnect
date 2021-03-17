@@ -11,7 +11,10 @@ const LocalStrategy = require("passport-local");
 const session = require("express-session");
 const flash = require("connect-flash");
 const multer = require("multer");
-const { uploadToDrive, picToDrive } = require("./driveApi.js");
+const {
+  uploadToDrive,
+  picToDrive
+} = require("./driveApi.js");
 const expressValidator = require('express-validator');
 
 app.use(express.json());
@@ -19,7 +22,9 @@ app.engine("ejs", ejsMate);
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.use(express.static(path.join(__dirname, "public"))); //for serving static files
-app.use(express.urlencoded({ extended: true })); //for parsing form data
+app.use(express.urlencoded({
+  extended: true
+})); //for parsing form data
 app.use(flash());
 
 app.use(
@@ -67,21 +72,21 @@ app.use(function (req, res, next) {
 
 // Express Validator Middleware
 app.use(expressValidator({
-  errorFormatter: function(param, msg, value){
+  errorFormatter: function (param, msg, value) {
     var namespace = param.split("."),
-    root = namespace.shift(),
-    formParam = root;
+      root = namespace.shift(),
+      formParam = root;
 
-    while(namespace.length){
+    while (namespace.length) {
       formParam += "[" + namespace.shift() + "]";
     }
     return {
-      param : formParam,
-      msg : msg,
-      value : value
+      param: formParam,
+      msg: msg,
+      value: value
     };
   }
-})); 
+}));
 
 const isLoggedIn = (req, res, next) => {
   if (!req.isAuthenticated()) {
@@ -101,7 +106,9 @@ const storage = multer.diskStorage({
   },
 });
 
-var upload = multer({ storage: storage });
+var upload = multer({
+  storage: storage
+});
 var file;
 app.post("/uploadfile", upload.single("file"), (req, res, next) => {
   file = req.file;
@@ -140,7 +147,16 @@ app.post("/upload", isLoggedIn, async (req, res) => {
       previewPicIds.push(uploadedPic.data.id)
     }
 
-    const{ university, course, title, category, date, topic, num_pages, description } = req.body;
+    const {
+      university,
+      course,
+      title,
+      category,
+      date,
+      topic,
+      num_pages,
+      description
+    } = req.body;
     const driveId = uploadedFile.data.id;
     const uploader = {
       id: req.user._id,
@@ -153,30 +169,20 @@ app.post("/upload", isLoggedIn, async (req, res) => {
       course: course,
       title: title,
       category: category,
-      date : date,
+      date: date,
       topic: topic,
       num_pages: num_pages,
       description: description,
       uploader: uploader,
       driveId: driveId,
-      previewPics : previewPicIds
+      previewPics: previewPicIds
     });
-    doc.save(function(err){
-      if(err)
+    doc.save(function (err) {
+      if (err)
         console.log(err);
       else
         console.log(doc);
     });
-    
-    
-    // const uploadedPic = await picToDrive(
-    //   previewPics[1].originalname,
-    //   previewPics[1].mimetype
-    // );
-    // const uploadedPic = await picToDrive(
-    //   previewPics[2].originalname,
-    //   previewPics[2].mimetype
-    // );
 
   } catch (error) {
     console.log(error);
@@ -188,7 +194,9 @@ app.get("/results", (req, res) => {
 });
 
 app.get("/upload", isLoggedIn, (req, res) => {
-  res.render("upload.ejs", {courses});
+  res.render("upload.ejs", {
+    courses
+  });
 });
 
 app.get("/users/:user_id", isLoggedIn, async (req, res) => {
@@ -218,41 +226,41 @@ app.get("/single_material", (req, res) => {
 
 app.post("/register", async (req, res) => {
   try {
-    const { fullname, username, email, university, password, cpwd } = req.body;
+
+    const {
+      fullname,
+      university,
+      username,
+      password
+    } = req.body;
 
     req.checkBody("fullname", "Name is required").notEmpty();
     req.checkBody("university", "University is required").notEmpty();
-    req.checkBody("email", "Enter a valid Email-id").isEmail();
+    req.checkBody("username", "Enter a valid Email-id").isEmail();
     req.checkBody("password", "Password is required").notEmpty();
     req.checkBody("cpwd", "Passwords do not match").equals(req.body.password);
 
     let errors = req.validationErrors();
-    if(errors){
-      console.log(errors);
-     res.render("signup.ejs",{
-       errors: errors
-     });
-    }
-    else{
+    if (errors) {
+      res.render("signup.ejs", {
+        errors
+      });
+    } else {
       const user = new User({
-      username: username,
-      email: email,
-      fullname: fullname,
-      university: university,
-    });
-    const registedUser = await User.register(user, password);
-    console.log(registedUser);
-    //res.send("Registered Successfully");
-    req.flash("success", "You are now registered");
-    res.redirect("/signup");
-
+        username: username,
+        fullname: fullname,
+        university: university,
+      });
+      const registedUser = await User.register(user, password);
+      console.log(registedUser);
+      req.flash("success", "You are now registered");
+      res.redirect("/signup");
     }
-
-    
-  } catch (e) {
+  } catch (error) {
     req.flash("danger", "That email is already registered!");
-    return res.redirect("/signup");
+    return res.redirect("/signup")
   }
+
 });
 
 app.post("/login", (req, res, next) => {
@@ -260,7 +268,7 @@ app.post("/login", (req, res, next) => {
     failureRedirect: "/signup",
     successRedirect: "/results",
     failureFlash: true,
-    successFlash:"Welcome to EduConnect " + req.body.username + "!",
+    successFlash: "Welcome to EduConnect " + req.body.username + "!",
   })(req, res, next);
 });
 

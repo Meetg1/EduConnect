@@ -10,11 +10,6 @@ const UserSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
-  profilePhoto: {
-    type: String,
-    default:
-      "https://image.shutterstock.com/image-vector/profile-picture-vector-600w-404138239.jpg",
-  },
   university: {
     type: String,
     required: true,

@@ -9,19 +9,15 @@
 
    <%- include('partials/navbar')%>
    <%- messages('messages', locals) %>
-   <% if(errors)
-  { %>
-        %< error.forEach(function(errors)
-       {
-         <div class ="alert alert-danger">
-             <%= errors[error].msg  %>
-         </div>
-       })
-       >%
-    <% 
-  } %>
 
-
+   <% if(typeof(errors) !="undefined") { %>
+      
+      <% errors.forEach((error) => { %>
+         <div class ="alert alert-danger"><%= error.msg  %></div>
+      <%})%>
+       
+   <%}%>
+   
    <section id='section1'>
   
       <div class="container2">
@@ -49,7 +45,6 @@
                   <h2>Create an account</h2>
                   <div class="tab">
                       <input type="text" name="fullname" placeholder="Full name" />
-                      <!-- <input type="email" name="email" placeholder="Email Address" /> -->
                       <input type="text" name="university" placeholder="University" />
                   </div>
                   <div class="tab">
@@ -83,7 +78,7 @@
          </div>
       </div>
    </section>
-
+   
    <script type="text/javascript">
       const toggleForm = () => {
          const container = document.querySelector('.container2');
