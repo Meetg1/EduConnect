@@ -136,12 +136,12 @@ app.post("/uploadpics", upload.single("file"), (req, res, next) => {
 //============================================================
 
 app.post("/upload", isLoggedIn, async (req, res) => {
-  console.log(req.body);
+  // console.log(req.body);
   try {
     const uploadedFile = await uploadToDrive(file.originalname, file.mimetype);
-    if (uploadedFile) {
-      console.log(uploadedFile.data.id);
-    }
+    // if (uploadedFile) {
+    //   // console.log(uploadedFile.data.id);
+    // }
     for (let i = 0; i < previewPics.length; i++) {
       const uploadedPic = await picToDrive(previewPics[i].originalname, previewPics[i].mimetype);
       previewPicIds.push(uploadedPic.data.id)
@@ -177,12 +177,12 @@ app.post("/upload", isLoggedIn, async (req, res) => {
       driveId: driveId,
       previewPics: previewPicIds
     });
-    doc.save(function (err) {
-      if (err)
-        console.log(err);
-      else
-        console.log(doc);
-    });
+
+    const uploadedDoc = await doc.save()
+    console.log(uploadedDoc);
+    const foundUser = await User.findById(req.user._id);
+    foundUser.uploads = foundUser.uploads + 1;
+    foundUser.save();   
 
   } catch (error) {
     console.log(error);
@@ -213,7 +213,6 @@ app.get("/upload", isLoggedIn, (req, res) => {
 app.get("/users/:user_id", isLoggedIn, async (req, res) => {
   try {
     foundUser = await User.findById(req.params.user_id);
-    console.log(foundUser.id);
 
     if (!foundUser) {
       req.flash("danger", "No such user found");
