@@ -213,11 +213,24 @@ app.get("/upload", isLoggedIn, (req, res) => {
 app.get("/users/:user_id", isLoggedIn, async (req, res) => {
   try {
     foundUser = await User.findById(req.params.user_id);
+    console.log(foundUser.id);
+
     if (!foundUser) {
       req.flash("danger", "No such user found");
-      return res.redirect("/results");
+      return res.redirect("/results");      
     }
-    res.render("profile.ejs");
+    else{
+      Document.find().where('uploader.id').equals(foundUser.id).exec(function(err,docs){
+         if(err){
+            console.log(err);
+          } else{
+            res.render("profile.ejs",{
+            docs: docs
+            });
+          }
+      });
+    
+    }
   } catch (error) {
     console.error(error);
   }
