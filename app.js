@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const path = require("path");
 const ejsMate = require("ejs-mate");
+const courses = require("./courses")
 const mongoose = require("mongoose");
 const User = require("./models/user.js");
 const Document = require("./models/Document.js");
@@ -10,13 +11,21 @@ const LocalStrategy = require("passport-local");
 const session = require("express-session");
 const flash = require("connect-flash");
 const multer = require("multer");
-const { uploadToDrive, picToDrive } = require("./driveApi.js");
+const {
+  uploadToDrive,
+  picToDrive
+} = require("./driveApi.js");
+const expressValidator = require('express-validator');
 
+app.use(express.json());
 app.engine("ejs", ejsMate);
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.use(express.static(path.join(__dirname, "public"))); //for serving static files
-app.use(express.urlencoded({ extended: true })); //for parsing form data
+app.use(express.urlencoded({
+  extended: true
+})); //for parsing form data
+app.use(flash());
 
 app.use(
   session({
@@ -26,7 +35,7 @@ app.use(
   })
 );
 
-app.use(flash());
+
 
 //====================DATABASE CONNECTION==========================
 const dbUrl = "mongodb://localhost:27017/test";
@@ -61,6 +70,24 @@ app.use(function (req, res, next) {
   next();
 });
 
+// Express Validator Middleware
+app.use(expressValidator({
+  errorFormatter: function (param, msg, value) {
+    var namespace = param.split("."),
+      root = namespace.shift(),
+      formParam = root;
+
+    while (namespace.length) {
+      formParam += "[" + namespace.shift() + "]";
+    }
+    return {
+      param: formParam,
+      msg: msg,
+      value: value
+    };
+  }
+}));
+
 const isLoggedIn = (req, res, next) => {
   if (!req.isAuthenticated()) {
     req.flash("danger", "Please Log In First!");
@@ -79,7 +106,9 @@ const storage = multer.diskStorage({
   },
 });
 
-var upload = multer({ storage: storage });
+var upload = multer({
+  storage: storage
+});
 var file;
 app.post("/uploadfile", upload.single("file"), (req, res, next) => {
   file = req.file;
@@ -118,7 +147,16 @@ app.post("/upload", isLoggedIn, async (req, res) => {
       previewPicIds.push(uploadedPic.data.id)
     }
 
-    const{ university, course, title, category, date, topic, num_pages, description } = req.body;
+    const {
+      university,
+      course,
+      title,
+      category,
+      date,
+      topic,
+      num_pages,
+      description
+    } = req.body;
     const driveId = uploadedFile.data.id;
     const uploader = {
       id: req.user._id,
@@ -131,42 +169,45 @@ app.post("/upload", isLoggedIn, async (req, res) => {
       course: course,
       title: title,
       category: category,
-      date : date,
+      date: date,
       topic: topic,
       num_pages: num_pages,
       description: description,
       uploader: uploader,
       driveId: driveId,
-      previewPics : previewPicIds
+      previewPics: previewPicIds
     });
-    doc.save(function(err){
-      if(err)
+    doc.save(function (err) {
+      if (err)
         console.log(err);
       else
         console.log(doc);
     });
-    
-    
-    // const uploadedPic = await picToDrive(
-    //   previewPics[1].originalname,
-    //   previewPics[1].mimetype
-    // );
-    // const uploadedPic = await picToDrive(
-    //   previewPics[2].originalname,
-    //   previewPics[2].mimetype
-    // );
 
   } catch (error) {
     console.log(error);
   }
 });
 
-app.get("/results", (req, res) => {
-  res.render("results.ejs");
+app.get("/results", function(req, res){
+  Document.find({},function(err, docs){
+    if(err){
+      console.log(err);
+    }else{
+      console.log(docs);
+      res.render("results.ejs",{
+        docs: docs
+
+      });
+    }
+  });  
 });
 
+
 app.get("/upload", isLoggedIn, (req, res) => {
-  res.render("upload.ejs");
+  res.render("upload.ejs", {
+    courses
+  });
 });
 
 app.get("/users/:user_id", isLoggedIn, async (req, res) => {
@@ -190,34 +231,53 @@ app.get("/signup", (req, res) => {
   res.render("signup.ejs");
 });
 
-app.get("/single_material", (req, res) => {
-  res.render("single_material.ejs");
+
+
+app.get("/single_material/:document_id", function(req, res){
+    Document.findById(req.params.document_id, function(err, docs){
+      res.render("single_material.ejs",{
+          docs:docs
+      });  
+    });  
 });
 
 app.post("/register", async (req, res) => {
-  const { password, cpwd } = req.body;
-  if (password != cpwd) {
-    req.flash("danger", "Passwords do not match");
-    return res.redirect("/signup");
-  }
   try {
-    const { fullname, username, email, university } = req.body;
-    const user = new User({
-      username: username,
-      email: email,
-      fullname: fullname,
-      university: university,
-    });
-    const registedUser = await User.register(user, password);
-    console.log(registedUser);
-    //res.send("Registered Successfully");
-    req.flash("success", "You are now registered");
 
-    res.redirect("/signup");
-  } catch (e) {
-    req.flash("danger", "That username is already taken!");
-    return res.redirect("/signup");
+    const {
+      fullname,
+      university,
+      username,
+      password
+    } = req.body;
+
+    req.checkBody("fullname", "Name is required").notEmpty();
+    req.checkBody("university", "University is required").notEmpty();
+    req.checkBody("username", "Enter a valid Email-id").isEmail();
+    req.checkBody("password", "Password is required").notEmpty();
+    req.checkBody("cpwd", "Passwords do not match").equals(req.body.password);
+
+    let errors = req.validationErrors();
+    if (errors) {
+      res.render("signup.ejs", {
+        errors
+      });
+    } else {
+      const user = new User({
+        username: username,
+        fullname: fullname,
+        university: university,
+      });
+      const registedUser = await User.register(user, password);
+      console.log(registedUser);
+      req.flash("success", "You are now registered");
+      res.redirect("/signup");
+    }
+  } catch (error) {
+    req.flash("danger", "That email is already registered!");
+    return res.redirect("/signup")
   }
+
 });
 
 app.post("/login", (req, res, next) => {
@@ -225,13 +285,14 @@ app.post("/login", (req, res, next) => {
     failureRedirect: "/signup",
     successRedirect: "/results",
     failureFlash: true,
+    successFlash: "Welcome to EduConnect " + req.body.username + "!",
   })(req, res, next);
 });
 
 //Logout
 app.get("/logout", (req, res) => {
   req.logout();
-  req.flash("success", "You are logged out");
+  req.flash("success", "Logged Out Successfully.");
   res.redirect("/signup");
 });
 
