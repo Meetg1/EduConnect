@@ -26,6 +26,18 @@ const UserSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
+  notes_uploads: {
+    type: Number,
+    default: 0,
+  },
+  assignments_uploads: {
+    type: Number,
+    default: 0,
+  },
+  papers_uploads: {
+    type: Number,
+    default: 0,
+  },
   followers: {
     type: Number,
     default: 0,

@@ -25,7 +25,7 @@
         <div class="profile-stats">
           <ul>
             <br>
-            <li><span class="profile-stat-count"><strong><%= currentUser.upvotes %></strong></span> <%= currentUser.uploads %></li>
+            <li><span class="profile-stat-count"><strong><%= currentUser.uploads %></strong></span> Uploads</li>
             <li><span class="profile-stat-count"><strong><%= currentUser.followers %></strong></span> followers</li>
           </ul>
         </div>
@@ -43,14 +43,14 @@
               </svg></h4>
             <hr>
             <div class="numBox">
-              <div class="num"><span><strong>65</strong></span></div>
-              <div class="num"><span><strong>65</strong></span></div>
-              <div class="num"><span><strong>65</strong></span></div>
+              <div class="num"><span><strong><%= currentUser.notes_uploads %></strong></span></div>
+              <div class="num"><span><strong><%= currentUser.papers_uploads %></strong></span></div>
+              <div class="num"><span><strong><%= currentUser.assignments_uploads %></strong></span></div>
             </div>
             <div class="numBox">
               <div class="num ml-4 light"> notes</div>
               <div class="num ml-5 light"> papers</div>
-              <div class="num ml-3 light"> presentations</div>
+              <div class="num ml-3 light"> Assignments</div>
             </div>    
 
           </div>
@@ -153,8 +153,8 @@
                 <%})%>
            
            <%}%>  
-
-              
+              <br>
+              <hr style="margin-top : 35px;">
 
 
         </section>

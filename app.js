@@ -182,6 +182,10 @@ app.post("/upload", isLoggedIn, async (req, res) => {
     console.log(uploadedDoc);
     const foundUser = await User.findById(req.user._id);
     foundUser.uploads = foundUser.uploads + 1;
+    foundUser.points = foundUser.points + 20;
+    if(doc.category=="Lecture Notes"){ foundUser.notes_uploads++; }
+    else if(doc.category=="Question Paper"){ foundUser.papers_uploads++; }
+    else if(doc.category=="Assignment"){ foundUser.assignments_uploads++; }  
     foundUser.save();   
 
   } catch (error) {
