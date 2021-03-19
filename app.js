@@ -220,8 +220,19 @@ app.post('/single_material/:document_id/reviews', isLoggedIn,async (req, res) =>
     author: req.user._id
   })
 
+
+
   const foundDoc = await Document.findById(req.params.document_id)
-  foundDoc.reviews.push(review)
+  if(review.upvote){
+      console.log("upvote done");
+      foundDoc.upvotes++; 
+  }
+  else{
+      console.log("downvote done");
+      foundDoc.downvotes++;
+  }
+  foundDoc.reviews.push(review);
+  foundDoc.save();
 
   const user = await User.findById(req.user._id);
   user.points += 5;
