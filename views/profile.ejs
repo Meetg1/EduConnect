@@ -9,10 +9,11 @@
 <body>
 
   <%- include('partials/navbar')%>
+
     <div class="jumbotron jumbotron-fluid">
       <div class="container">
         <div class="profile-user-settings">
-          <h1 class="profile-user-name">&nbsp; &nbsp; &nbsp;<%= currentUser.fullname %></h1>
+          <h1 class="profile-user-name"><%= currentUser.fullname %></h1>
           <div class="box row">
             <div class="wrapper col-md-2 col-6">
               <img src="https://image.shutterstock.com/image-vector/profile-picture-vector-600w-404138239.jpg" alt="" class="image--cover" />
@@ -20,10 +21,10 @@
           </div>
           <br>
           <div class="univ" href="#"><%= currentUser.university %></div>
-          <div class="univ" href="#"><%= currentUser.username %></div>
+          <div class="univ mt-2" href="#"><%= currentUser.username %></div>
         </div>
         <div class="profile-stats">
-          <ul>
+          <ul class="pl-0">
             <br>
             <li><span class="profile-stat-count"><strong><%= currentUser.uploads %></strong></span> Uploads</li>
             <li><span class="profile-stat-count"><strong><%= currentUser.followers %></strong></span> followers</li>
@@ -31,7 +32,7 @@
         </div>
       </div>
     </div>
-    <div class="container">
+    <div class="container pl-0">
       <section class="statFigures mt-5">
         <h1 class="format">Stats & Figures</h1>
         <div class="statBox row mt-5">
@@ -88,7 +89,7 @@
     </div>
     </section>
     <br>
-    <div class="container">
+    <div class="container pl-0">
       <h1 class="htip">Important Tip <svg class="bulb" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
           fill="currentColor" class="bi bi-lightbulb-fill" viewBox="0 0 16 16">
           <path

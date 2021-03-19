@@ -6,6 +6,7 @@ const courses = require("./courses")
 const mongoose = require("mongoose");
 const User = require("./models/user.js");
 const Document = require("./models/Document.js");
+const Review = require("./models/Review.js");
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
 const session = require("express-session");
@@ -139,9 +140,9 @@ app.post("/upload", isLoggedIn, async (req, res) => {
   // console.log(req.body);
   try {
     const uploadedFile = await uploadToDrive(file.originalname, file.mimetype);
-    // if (uploadedFile) {
-    //   // console.log(uploadedFile.data.id);
-    // }
+    if (uploadedFile) {
+      // console.log(uploadedFile.data.id);
+    }
     for (let i = 0; i < previewPics.length; i++) {
       const uploadedPic = await picToDrive(previewPics[i].originalname, previewPics[i].mimetype);
       previewPicIds.push(uploadedPic.data.id)
@@ -183,30 +184,58 @@ app.post("/upload", isLoggedIn, async (req, res) => {
     const foundUser = await User.findById(req.user._id);
     foundUser.uploads = foundUser.uploads + 1;
     foundUser.points = foundUser.points + 20;
-    if(doc.category=="Lecture Notes"){ foundUser.notes_uploads++; }
-    else if(doc.category=="Question Paper"){ foundUser.papers_uploads++; }
-    else if(doc.category=="Assignment"){ foundUser.assignments_uploads++; }  
-    foundUser.save();   
+    if (doc.category == "Lecture Notes") {
+      foundUser.notes_uploads++;
+    } else if (doc.category == "Question Paper") {
+      foundUser.papers_uploads++;
+    } else if (doc.category == "Assignment") {
+      foundUser.assignments_uploads++;
+    }
+    foundUser.save();
 
   } catch (error) {
     console.log(error);
   }
 });
 
-app.get("/results", function(req, res){
-  Document.find({},function(err, docs){
-    if(err){
+app.get("/results", function (req, res) {
+  Document.find({}, function (err, docs) {
+    if (err) {
       console.log(err);
-    }else{
-      console.log(docs);
-      res.render("results.ejs",{
+    } else {
+      res.render("results.ejs", {
         docs: docs
 
       });
     }
-  });  
+  });
 });
 
+app.post('/single_material/:document_id/reviews', isLoggedIn,async (req, res) => {
+  console.log(req.body)
+  const upvote = (req.body.upDown == 'upvote') ? true : false;
+  const review = new Review({
+    upvote: upvote,
+    text: req.body.text,
+    author: req.user._id
+  })
+
+  const foundDoc = await Document.findById(req.params.document_id)
+  foundDoc.reviews.push(review)
+
+  const user = await User.findById(req.user._id);
+  user.points += 5;
+
+  await review.save();
+  await foundDoc.save();
+  await user.save();
+
+  console.log(review)
+  console.log(foundDoc)
+
+  req.flash('success', 'Review submitted successfully!');
+  res.redirect("/single_material/"+req.params.document_id);
+})
 
 app.get("/upload", isLoggedIn, (req, res) => {
   res.render("upload.ejs", {
@@ -220,19 +249,18 @@ app.get("/users/:user_id", isLoggedIn, async (req, res) => {
 
     if (!foundUser) {
       req.flash("danger", "No such user found");
-      return res.redirect("/results");      
-    }
-    else{
-      Document.find().where('uploader.id').equals(foundUser.id).exec(function(err,docs){
-         if(err){
-            console.log(err);
-          } else{
-            res.render("profile.ejs",{
+      return res.redirect("/results");
+    } else {
+      Document.find().where('uploader.id').equals(foundUser.id).exec(function (err, docs) {
+        if (err) {
+          console.log(err);
+        } else {
+          res.render("profile.ejs", {
             docs: docs
-            });
-          }
+          });
+        }
       });
-    
+
     }
   } catch (error) {
     console.error(error);
@@ -249,12 +277,19 @@ app.get("/signup", (req, res) => {
 
 
 
-app.get("/single_material/:document_id", function(req, res){
-    Document.findById(req.params.document_id, function(err, docs){
-      res.render("single_material.ejs",{
-          docs:docs
-      });  
-    });  
+app.get("/single_material/:document_id", async function (req, res) {
+  const doc = await Document.findById(req.params.document_id).populate({
+    path: 'reviews',
+    populate: {
+      path: 'author'
+    }
+  }).populate('author');
+  if (!doc) {
+    req.flash('error', 'Cannot find that document!');
+    return res.redirect('/results');
+  }
+  res.render('single_material.ejs', { doc });
+
 });
 
 app.post("/register", async (req, res) => {

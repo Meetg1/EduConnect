@@ -11,6 +11,7 @@
 .mySlides {
   display: none;
 }
+
 img {
   vertical-align: middle;
 }
@@ -21,6 +22,7 @@ img {
   position: relative;
   margin: auto;
 }
+
 
 /* Next & previous buttons */
 .prev,
@@ -97,16 +99,49 @@ img {
   object-fit: cover;
 }
 
-.comment {
-  width: 350em !important;
-  margin-left: auto;
-  margin-right: auto;
+
+
+
+.form__answer {
+  display: inline-block;
+  box-sizing: border-box;
+  vertical-align: top;
+  font-size: 2px;
+  text-align: center;
 }
+
+label {
+  box-sizing: border-box;
+  display: block;
+  height: 100%;
+  width: 100%;
+  cursor: pointer;
+  opacity: .3;
+  transition: all .2s ease-in-out;
+}
+
+/* Input style */
+
+input[type="radio"] {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+input[type="radio"]:active~label {
+  opacity: 1;
+}
+
+input[type="radio"]:checked~label {
+  opacity: 1;
+}
+
 
 @-webkit-keyframes fade {
   from {
     opacity: 0.4;
   }
+
   to {
     opacity: 1;
   }
@@ -116,6 +151,7 @@ img {
   from {
     opacity: 0.4;
   }
+
   to {
     opacity: 1;
   }
@@ -123,55 +159,10 @@ img {
 
 /* On smaller screens, decrease text size */
 @media only screen and (max-width: 300px) {
+
   .prev,
   .next,
   .text {
     font-size: 11px;
   }
-}
-
-.spacing {
-  padding-left: 110px;
-  color: inherit;
-}
-.text-danger {
-  margin-left: 50px;
-  margin-top: 20px;
-}
-.text-success {
-  margin-top: 20px;
-}
-.text-danger:hover {
-  fill: red;
-}
-.text-success:hover {
-  fill: green;
-}
-.button1 {
-  width: 250px;
-  margin-left: 122px;
-  border-radius: 6px;
-}
-.button1:hover {
-  background-color: green;
-  cursor: pointer;
-  color: white;
-}
-@media screen and (max-width: 600px) {
-  .col-75 {
-    width: 100%;
-    margin-top: 0;
-  }
-}
-.row:after {
-  content: "";
-  display: table;
-  clear: both;
-}
-.cont {
-  width: 850px;
-  height: 500px;
-  margin-left: 50px;
-  border: 2px solid lightgray;
-  padding-left: 0px;
 }

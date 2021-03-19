@@ -33,6 +33,11 @@ const DocumentSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  driveId : {
+    type : String,
+    required : true,
+  },
+  previewPics : [String],
   uploader : {                                            
     id : {
       type: mongoose.Schema.Types.ObjectId,
@@ -40,11 +45,10 @@ const DocumentSchema = new mongoose.Schema({
     },
     username : String
   },
-  driveId : {
-    type : String,
-    required : true,
-  },
-  previewPics : [String]
+  reviews : [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Review"
+  }]
 });
 
 module.exports = mongoose.model("Document", DocumentSchema);
