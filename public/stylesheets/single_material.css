@@ -99,8 +99,22 @@ img {
   object-fit: cover;
 }
 
+.text-danger {
+  margin-left: 50px;
+  margin-top: 20px;
+}
 
+.text-success {
+  margin-top: 20px;
+}
 
+.text-danger:hover {
+  fill: red;
+}
+
+.text-success:hover {
+  fill: green;
+}
 
 .form__answer {
   display: inline-block;

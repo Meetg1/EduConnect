@@ -220,8 +220,6 @@ app.post('/single_material/:document_id/reviews', isLoggedIn,async (req, res) =>
     author: req.user._id
   })
 
-
-
   const foundDoc = await Document.findById(req.params.document_id)
   if(review.upvote){
       console.log("upvote done");
@@ -234,18 +232,22 @@ app.post('/single_material/:document_id/reviews', isLoggedIn,async (req, res) =>
   foundDoc.reviews.push(review);
   foundDoc.save();
 
+  const docOwner = await User.findById(foundDoc.uploader.id)
+  docOwner.upvotes++;
+
   const user = await User.findById(req.user._id);
   user.points += 5;
 
   await review.save();
   await foundDoc.save();
   await user.save();
+  await docOwner.save();
 
   console.log(review)
-  console.log(foundDoc)
-
+  
   req.flash('success', 'Review submitted successfully!');
   res.redirect("/single_material/"+req.params.document_id);
+
 })
 
 app.get("/upload", isLoggedIn, (req, res) => {
@@ -296,7 +298,7 @@ app.get("/single_material/:document_id", async function (req, res) {
     }
   }).populate('author');
   if (!doc) {
-    req.flash('error', 'Cannot find that document!');
+    req.flash('danger', 'Cannot find that document!');
     return res.redirect('/results');
   }
   res.render('single_material.ejs', { doc });
