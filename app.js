@@ -14,7 +14,8 @@ const flash = require("connect-flash");
 const multer = require("multer");
 const {
   uploadToDrive,
-  picToDrive
+  picToDrive,
+  getFileFromDrive
 } = require("./driveApi.js");
 const expressValidator = require('express-validator');
 
@@ -104,12 +105,15 @@ const storage = multer.diskStorage({
   },
   filename: function (req, file, cb) {
     cb(null, file.originalname);
+  },limits: {
+    fileSize: 100000000 // max file size 100MB 
   },
 });
 
 var upload = multer({
   storage: storage
 });
+
 var file;
 app.post("/uploadfile", upload.single("file"), (req, res, next) => {
   file = req.file;
@@ -136,12 +140,31 @@ app.post("/uploadpics", upload.single("file"), (req, res, next) => {
 });
 //============================================================
 
+app.get('/download/:document_id', async (req, res) => { 
+  
+  try {
+    const doc = await Document.findById(req.params.document_id);   
+    console.log("here")
+    await getFileFromDrive(doc.driveId,doc.fileName)
+    setTimeout(function(){ 
+      res.download(__dirname +'/downloads/'+doc.fileName);
+    }, 3000); 
+    
+  } catch (error) {
+    res.status(400).send('Error while downloading file. Try again later.');
+  }
+  
+});
+
+
+//============================================================
+
 app.post("/upload", isLoggedIn, async (req, res) => {
   // console.log(req.body);
   try {
     const uploadedFile = await uploadToDrive(file.originalname, file.mimetype);
     if (uploadedFile) {
-      // console.log(uploadedFile.data.id);
+      console.log(uploadedFile);
     }
     for (let i = 0; i < previewPics.length; i++) {
       const uploadedPic = await picToDrive(previewPics[i].originalname, previewPics[i].mimetype);
@@ -163,8 +186,6 @@ app.post("/upload", isLoggedIn, async (req, res) => {
       id: req.user._id,
       username: req.user.username
     }
-
-
     const doc = new Document({
       university: university,
       course: course,
@@ -176,6 +197,8 @@ app.post("/upload", isLoggedIn, async (req, res) => {
       description: description,
       uploader: uploader,
       driveId: driveId,
+      mimeType: file.mimetype,
+      fileName: file.originalname,
       previewPics: previewPicIds
     });
 
@@ -199,6 +222,7 @@ app.post("/upload", isLoggedIn, async (req, res) => {
 });
 
 app.get("/results", function (req, res) {
+  
   Document.find({}, function (err, docs) {
     if (err) {
       console.log(err);

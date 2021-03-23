@@ -89,8 +89,10 @@
       Author Email
     </div>
     <div class="w3-quarter w3-section">
-      <span class="w3-xlarge">Download</span><br>
-      Now
+      <form action="/download/<%=doc._id%>" method="get">
+        <button type="submit" class="w3-xlarge" id="downloadBtn">Download Now</button><br>
+      </form>
+      
     </div>
   </div>
 
@@ -214,52 +216,37 @@
     </div>
   </div>
 
-
-
-
-
-
-
-
      
 </body>
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
   integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"
   integrity="sha384-Piv4xVNRyMGpqkS2by6br4gNJ7DXjqk09RmUpJ8jgGtD7zP9yug3goQfGII0yAns" crossorigin="anonymous"></script>
+
 </body>
 
-<script type="text/javascript">
-  var slideIndex = 1;
-  showSlides(slideIndex);
+<script>
 
-  function plusSlides(n) {
-    showSlides(slideIndex += n);
-  }
+        var slideIndex = 1;
+        showSlides(slideIndex);
 
-  function currentSlide(n) {
-    showSlides(slideIndex = n);
-  }
+        function plusSlides(n) {
+        showSlides(slideIndex += n);
+        }
 
-  function showSlides(n) {
-    var i;
-    var slides = document.getElementsByClassName("mySlides");
-    var dots = document.getElementsByClassName("dot");
-    if (n > slides.length) {
-      slideIndex = 1
-    }
-    if (n < 1) {
-      slideIndex = slides.length
-    }
-    for (i = 0; i < slides.length; i++) {
-      slides[i].style.display = "none";
-    }
-    for (i = 0; i < dots.length; i++) {
-      dots[i].className = dots[i].className.replace(" active_dots", "");
-    }
-    slides[slideIndex - 1].style.display = "block";
-    dots[slideIndex - 1].className += " active_dots";
-  }
-</script>
+        function currentSlide(n) {
+        showSlides(slideIndex = n);
+        }
 
+        function showSlides(n) {
+        var i;
+        var slides = document.getElementsByClassName("mySlides");
+        var dots = document.getElementsByClassName("dot");
+        if (n > slides.length) {
+        slideIndex = 1
+        }
+        if (n < 1) { slideIndex=slides.length } for (i=0; i < slides.length; i++) { slides[i].style.display="none" ; }
+          for (i=0; i < dots.length; i++) { dots[i].className=dots[i].className.replace(" active_dots", "" ); }
+          slides[slideIndex - 1].style.display="block" ; dots[slideIndex - 1].className +=" active_dots" ; } 
+  </script>
 </html>
