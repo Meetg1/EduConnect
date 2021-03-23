@@ -181,40 +181,61 @@ app.post("/upload", isLoggedIn, async (req, res) => {
       num_pages,
       description
     } = req.body;
-    const driveId = uploadedFile.data.id;
-    const uploader = {
-      id: req.user._id,
-      username: req.user.username
-    }
-    const doc = new Document({
-      university: university,
-      course: course,
-      title: title,
-      category: category,
-      date: date,
-      topic: topic,
-      num_pages: num_pages,
-      description: description,
-      uploader: uploader,
-      driveId: driveId,
-      mimeType: file.mimetype,
-      fileName: file.originalname,
-      previewPics: previewPicIds
-    });
 
-    const uploadedDoc = await doc.save()
-    console.log(uploadedDoc);
-    const foundUser = await User.findById(req.user._id);
-    foundUser.uploads = foundUser.uploads + 1;
-    foundUser.points = foundUser.points + 20;
-    if (doc.category == "Lecture Notes") {
-      foundUser.notes_uploads++;
-    } else if (doc.category == "Question Paper") {
-      foundUser.papers_uploads++;
-    } else if (doc.category == "Assignment") {
-      foundUser.assignments_uploads++;
+     req.checkBody("university", "University is required").notEmpty();
+     req.checkBody("course", "Course is required").notEmpty();
+     req.checkBody("title", "Title is required").notEmpty();
+     req.checkBody("category", "Category is required").notEmpty();
+     req.checkBody("date", "Date is required").notEmpty();
+     req.checkBody("topic", "Topic is required").notEmpty();
+     req.checkBody("num_pages", "num_pages is required").notEmpty();
+     req.checkBody("description", "description is required").notEmpty();
+
+     let errors = req.validationErrors();
+    if (errors) {
+      console.log(errors);
+      res.render("upload.ejs", {
+        errors
+      });
+    } else{
+
+      const driveId = uploadedFile.data.id;
+      const uploader = {
+        id: req.user._id,
+        username: req.user.username
+      }
+      const doc = new Document({
+        university: university,
+        course: course,
+        title: title,
+        category: category,
+        date: date,
+        topic: topic,
+        num_pages: num_pages,
+        description: description,
+        uploader: uploader,
+        driveId: driveId,
+        mimeType: file.mimetype,
+        fileName: file.originalname,
+        previewPics: previewPicIds
+      });
+
+      const uploadedDoc = await doc.save()
+      console.log(uploadedDoc);
+      const foundUser = await User.findById(req.user._id);
+      foundUser.uploads = foundUser.uploads + 1;
+      foundUser.points = foundUser.points + 20;
+      if (doc.category == "Lecture Notes") {
+        foundUser.notes_uploads++;
+      } else if (doc.category == "Question Paper") {
+        foundUser.papers_uploads++;
+      } else if (doc.category == "Assignment") {
+        foundUser.assignments_uploads++;
+      }
+      foundUser.save();
+
     }
-    foundUser.save();
+
 
   } catch (error) {
     console.log(error);
