@@ -38,11 +38,25 @@
             <li><a href="#about">ABOUT</a></li>
             <li><a href="#team">OUR TEAM</a></li>
             
-            
           </ul>
-          <ul class="nav navbar-nav navbar-right">
-            <li id="text"><a href="/signup"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
-            <li id="text"><a href="/signup"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+          
+
+         <ul class="nav navbar-nav navbar-right">
+
+           <% if(currentUser){ %>
+
+              <li id="text"><a href="/upload"><span class="glyphicon glyphicon-log-in"></span> Upload</a></li>
+              <li class="nav-item dropdown mr-3" id="text"><a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown"
+                  aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-user"></span> <%=currentUser.fullname%><span class="sr-only">(current)</span></a>
+
+                 <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                  <a class="dropdown-item" href="/users/<%=currentUser._id%>"><p id="text2">View profile</p></a>
+                  <a class="dropdown-item" href="/logout"><p id="text2">Logout</p></a>
+                </div>
+              </li>
+           <%}else{%>
+              <li id="text"><a href="/signup"><span class="glyphicon glyphicon-log-in"></span>Sign in</a></li>
+           <%}%>
          </ul>
         </div>
       </div>
@@ -62,24 +76,32 @@
       <p></p><br><br> 
        <a href="/results"><div id="get_started"><h2>Get Started</h2></div></a>
     </div>
-
+    <br>
     <div id="about">
       
-      <p ><h1 style="text-align: center;">About Us</h1></p>
-      <div class="row">
-          <div class="col-md-4"></div>
-          <div class="col-md-4"><p ><h4 style="text-align: center;">this is About Us</h4></p></div>
-          <div class="col-md-4"></div>
+      <p ><u><h1 style="text-align: center; color: black;">About Us</h1></u></p>
+
+      <div class="container panel" style="">
+          <div class="panel-body"><p><h4 style="text-align: center; width: 100%; padding-left: 30%; padding-right: 30%">
+            
+            <b>Edu-Cate With Edu-Connect</b> <br>
+            Its time to educate yourself with EduConnnect!
+            Come onboard, as we, a team of three, will be providing you'll a platform to learn, unlearn, unleash and get your hands on the best resources completely for free
+
+          </h4></p></div>
       </div>
 
     </div>
 
+    <br>
+    <p><u><h1 style="text-align: center; color: black;">Team Members</h1></u></p>
+    <br>
     <div class="container" id="team" style="width:100%">    
       <div class="row" style="color: black;">
 
-        <div class="col-sm-4">
-          <div class="panel" style="width:90%">
-            <div class="panel-heading">Team member 1</div>
+        <div class="col-md-4">
+          <div class="panel" style="width:100%">
+            <div class="panel-heading">Project Head</div>
             <div class="panel-body"><img src="../images/011_image.jpeg" class="img-responsive" style="width:100%;" alt="Image"></div>
             <div class="panel-footer">Meet Gajra <br><img style="max-height: 15px;" src="https://www.vectorlogo.zone/logos/gmail/gmail-icon.svg"> &nbsp; &nbsp;<a href="mailto:m.gajra@somaiya.edu">m.gajra@somaiya.edu</a> <br> 
               <img  style="max-height: 20px;" src="https://i.ibb.co/N9P0K9H/239px-Whats-App-svg.png" />
@@ -87,9 +109,9 @@
           </div>
         </div>
 
-        <div class="col-sm-4"> 
-          <div class="panel " style="width:90%">
-            <div class="panel-heading">Team member 2</div>
+        <div class="col-md-4"> 
+          <div class="panel " style="width:100%">
+            <div class="panel-heading">Project Head</div>
             <div class="panel-body"><img src="../images/013_image.jpeg" class="img-responsive" style="width:100%" alt="Image"></div>
             <div class="panel-footer">Shubh Gangar<br><img style="height: 15px;" src="https://www.vectorlogo.zone/logos/gmail/gmail-icon.svg">&nbsp; &nbsp;<a href="mailto:shubh.hg@somaiya.edu" >shubh.hg@somaiya.edu</a> <br>
               <img  style="max-height: 20px;" src="https://i.ibb.co/N9P0K9H/239px-Whats-App-svg.png" />
@@ -97,9 +119,9 @@
           </div>
         </div>
 
-        <div class="col-sm-4"> 
-          <div class="panel" style="width:90%">
-            <div class="panel-heading">Team member 3</div>
+        <div class="col-md-4"> 
+          <div class="panel" style="width:100%">
+            <div class="panel-heading">Project Head</div>
             <div class="panel-body"><img src="../images/015_image.jpeg" class="img-responsive" style="width:100%; max-height: 250px;" alt="Image"></div>
             <div class="panel-footer">Shubh Gosalia <br><img style="max-height: 15px;" src="https://www.vectorlogo.zone/logos/gmail/gmail-icon.svg">&nbsp; &nbsp;<a href="mailto:shubh.gosalia@somaiya.edu" >shubh.hg@gosalia.edu</a> <br>
               <img  style="max-height: 20px;" src="https://i.ibb.co/N9P0K9H/239px-Whats-App-svg.png" />
