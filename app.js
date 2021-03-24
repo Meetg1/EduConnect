@@ -14,10 +14,12 @@ const flash = require("connect-flash");
 const multer = require("multer");
 const {
   uploadToDrive,
-  picToDrive,
   getFileFromDrive
 } = require("./driveApi.js");
 const expressValidator = require('express-validator');
+const { v1: uuidv1 } = require('uuid');
+
+
 
 app.use(express.json());
 app.engine("ejs", ejsMate);
@@ -89,7 +91,7 @@ app.use(expressValidator({
     };
   }
 }));
-
+//====================middlewares===================================
 const isLoggedIn = (req, res, next) => {
   if (!req.isAuthenticated()) {
     req.flash("danger", "Please Log In First!");
@@ -98,8 +100,38 @@ const isLoggedIn = (req, res, next) => {
   next();
 };
 
+const checkReviewExistence = (req, res, next) => {
+  if (!req.isAuthenticated()) {
+    req.flash("danger", "Please Log In First!");
+    return res.redirect("/signup");
+  }
+  Document.findById(req.params.document_id).populate('reviews').exec(function(err, foundDoc){
+    if(!foundDoc || err) {
+      console.log(err)
+      return res.redirect('/results')
+    }
+    const foundReview = foundDoc.reviews.some(function(review) {
+      return review.author.equals(req.user._id)
+    })
+    if(foundReview){
+      req.flash('danger', 'You have already reviewed this document!')
+      res.redirect('/single_material/'+req.params.document_id)
+    }else if(foundDoc.uploader.id.equals(req.user._id)){
+      req.flash('danger', 'You cant review your own document!')
+      res.redirect('/single_material/'+req.params.document_id)
+    }else{
+      next()
+    }
+
+  })
+
+
+}
+
+//====================middlewares===================================
+
 //=======================MULTER=====================================
-const storage = multer.diskStorage({
+const storage1 = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, path.join(__dirname, "uploads"));
   },
@@ -110,12 +142,25 @@ const storage = multer.diskStorage({
   },
 });
 
-var upload = multer({
-  storage: storage
+var upload1 = multer({
+  storage: storage1
+});
+
+var storage2 = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, path.join(__dirname, "public/previewPics"))
+  },
+  filename: function (req, file, cb) {
+    cb(null, uuidv1() + path.extname(file.originalname));
+  }
+})
+
+var upload2 = multer({
+  storage: storage2
 });
 
 var file;
-app.post("/uploadfile", upload.single("file"), (req, res, next) => {
+app.post("/uploadfile", upload1.single("file"), (req, res, next) => {
   file = req.file;
   console.log(file);
   if (!file) {
@@ -126,10 +171,11 @@ app.post("/uploadfile", upload.single("file"), (req, res, next) => {
   res.send(file);
 });
 
-var previewPics = [];
+
 var previewPicIds = []
-app.post("/uploadpics", upload.single("file"), (req, res, next) => {
-  previewPics.push(req.file);
+app.post("/uploadpics", upload2.single("file"), (req, res, next) => {
+
+  previewPicIds.push(req.file.filename);
   // console.log(file);
   if (!file) {
     const error = new Error("Please upload a file");
@@ -140,7 +186,7 @@ app.post("/uploadpics", upload.single("file"), (req, res, next) => {
 });
 //============================================================
 
-app.get('/download/:document_id', async (req, res) => { 
+app.get('/download/:document_id', isLoggedIn,async (req, res) => { 
   
   try {
     const doc = await Document.findById(req.params.document_id);   
@@ -166,11 +212,7 @@ app.post("/upload", isLoggedIn, async (req, res) => {
     if (uploadedFile) {
       console.log(uploadedFile);
     }
-    for (let i = 0; i < previewPics.length; i++) {
-      const uploadedPic = await picToDrive(previewPics[i].originalname, previewPics[i].mimetype);
-      previewPicIds.push(uploadedPic.data.id)
-    }
-
+    
     const {
       university,
       course,
@@ -256,7 +298,7 @@ app.get("/results", function (req, res) {
   });
 });
 
-app.post('/single_material/:document_id/reviews', isLoggedIn,async (req, res) => {
+app.post('/single_material/:document_id/reviews', isLoggedIn, checkReviewExistence, async (req, res) => {
   console.log(req.body)
   const upvote = (req.body.upDown == 'upvote') ? true : false;
   const review = new Review({
@@ -290,7 +332,7 @@ app.post('/single_material/:document_id/reviews', isLoggedIn,async (req, res) =>
 
   console.log(review)
   
-  req.flash('success', 'Review submitted successfully!');
+  req.flash('success', 'Review submitted successfully. You earned 5 points!');
   res.redirect("/single_material/"+req.params.document_id);
 
 })

@@ -41,18 +41,9 @@ const DocumentSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  driveId : {
-    type : String,
-    required : true,
-  },
-  mimeType : {
-    type : String,
-    required : true,
-  },
-  fileName : {
-    type : String,
-    required : true,
-  },
+  driveId : String,
+  mimeType : String,
+  fileName : String,
   previewPics : [String],
   uploader : {                                            
     id : {
