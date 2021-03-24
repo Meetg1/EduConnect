@@ -16,12 +16,12 @@ body {
    color: #303030;
    font-weight: 400;
    margin-bottom: 30px;
- }  
- #get_started:hover { 
-   width: 200px;
-   height: 55px;
-
  }
+
+#get_started{
+  color: black;
+}
+
  .navbar-nav li a{
    color: #FFF !important;
  }

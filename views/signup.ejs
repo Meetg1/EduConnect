@@ -7,7 +7,6 @@
 
 <body>
 
-   <%- include('partials/navbar')%>
    <%- messages('messages', locals) %>
 
    <% if(typeof(errors) !="undefined") { %>
@@ -77,8 +76,10 @@
                   id="sign_in_img" /></div>
          </div>
       </div>
+      
    </section>
-   
+   <br>
+      <br>
    <script type="text/javascript">
       const toggleForm = () => {
          const container = document.querySelector('.container2');
