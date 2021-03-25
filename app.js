@@ -275,7 +275,7 @@ app.post("/upload", isLoggedIn, async (req, res) => {
         foundUser.assignments_uploads++;
       }
       foundUser.save();
-
+      previewPicIds=[];
     }
 
 
