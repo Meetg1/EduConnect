@@ -18,6 +18,10 @@ body {
    margin-bottom: 30px;
  }
 
+ #text2{
+  color:black;
+ }
+
 #get_started{
   color: black;
 }

@@ -172,7 +172,7 @@ app.post("/uploadfile", upload1.single("file"), (req, res, next) => {
 });
 
 
-var previewPicIds = []
+var previewPicIds = [];
 app.post("/uploadpics", upload2.single("file"), (req, res, next) => {
 
   previewPicIds.push(req.file.filename);
@@ -307,10 +307,12 @@ app.post('/single_material/:document_id/reviews', isLoggedIn, checkReviewExisten
     author: req.user._id
   })
 
-  const foundDoc = await Document.findById(req.params.document_id)
+  const foundDoc = await Document.findById(req.params.document_id);
+  const docOwner = await User.findById(foundDoc.uploader.id);
   if(review.upvote){
       console.log("upvote done");
       foundDoc.upvotes++; 
+      docOwner.upvotes++;
   }
   else{
       console.log("downvote done");
@@ -319,8 +321,8 @@ app.post('/single_material/:document_id/reviews', isLoggedIn, checkReviewExisten
   foundDoc.reviews.push(review);
   foundDoc.save();
 
-  const docOwner = await User.findById(foundDoc.uploader.id)
-  docOwner.upvotes++;
+  
+  
 
   const user = await User.findById(req.user._id);
   user.points += 5;
