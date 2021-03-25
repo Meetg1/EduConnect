@@ -189,11 +189,18 @@ app.post("/uploadpics", upload2.single("file"), (req, res, next) => {
 app.get('/download/:document_id', isLoggedIn,async (req, res) => { 
   
   try {
+    const user = await User.findById(req.user._id)
+    if(user.points<20) {
+      req.flash("danger", "Insufficient points! You need "+(20-user.points)+ "  more points to download this document!");
+      return res.redirect('/single_material/'+req.params.document_id)
+    }
     const doc = await Document.findById(req.params.document_id);   
     console.log("here")
     await getFileFromDrive(doc.driveId,doc.fileName)
     setTimeout(function(){ 
       res.download(__dirname +'/downloads/'+doc.fileName);
+      user.points -= 20;
+      user.save();
     }, 3000); 
     
   } catch (error) {

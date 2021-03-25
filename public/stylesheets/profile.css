@@ -161,7 +161,7 @@ html {
 .tip {
   color: darkblue;
   background-color: #e6e9ec;
-  margin-left: 10px;
+  /* margin-left: 10px; */
   font-size: 17px;
   font-family: inherit;
   padding: 10px;
@@ -170,8 +170,8 @@ html {
 .htip {
   color: #4e657e;
   font-size: 20px;
-  float: left;
-  margin-left: 15px;
+  /* float: left;
+  margin-left: 15px; */
   font-family: Verdana, Geneva, Tahoma, sans-serif;
 }
 
