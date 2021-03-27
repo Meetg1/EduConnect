@@ -12,12 +12,16 @@ const LocalStrategy = require("passport-local");
 const session = require("express-session");
 const flash = require("connect-flash");
 const multer = require("multer");
+const jwt=require("jsonwebtoken");
+const nodemailer=require("nodemailer");
+const {google}=require("googleapis");
 const {
   uploadToDrive,
   getFileFromDrive
 } = require("./driveApi.js");
 const expressValidator = require('express-validator');
 const { v1: uuidv1 } = require('uuid');
+const { PassThrough } = require("stream");
 
 
 
@@ -38,8 +42,50 @@ app.use(
     saveUninitialized: true,
   })
 );
+const CLIENT_ID="465802909834-papgnv7ostf26usmh27gehb3nnt4egjs.apps.googleusercontent.com";
+const CLIENT_SECRET="HM0fboBEXtUmqHiT8XDk0NA2";
+const REDIRECT_URI="https://developers.google.com/oauthplayground";
+const REFRESH_TOKEN="1//04CJnXCsgKx3hCgYIARAAGAQSNgF-L9IrLsnRQYMOsymeaeNpat3xRi2avvUiWxoEwYE-DqB729pQSCr29PNiv_Hvt5kiqbz8xw";
+const oAuth2Client=new google.auth.OAuth2(CLIENT_ID,CLIENT_SECRET,REDIRECT_URI)
+oAuth2Client.setCredentials({refresh_token:REFRESH_TOKEN})
+var em;
+var up;
+var pass; 
 
+async function sendMail(link)
+{ 
+     try{
+        const accessToken=await oAuth2Client.getAccessToken();
+        const transport=nodemailer.createTransport({
+            service:"gmail",
+            auth:{
+              type:"OAuth2",
+              user:"shubh.gosalia@somaiya.edu",
+              clientId:CLIENT_ID,
+              clientSecret:CLIENT_SECRET,
+              refreshToken:REFRESH_TOKEN,
+              accessToken:accessToken
+            }
+        })
+        
+        const mailOptions={
+          from:"EduConnect <shubh.gosalia@somaiya.edu>",
+          to:em,
+          subject:"EduConnect:Password Reset",
+          text:`<p>Kindly Click <a href=${link}>here</a> to reset your password!</p>`,
+          html:`<p>Kindly Click <a href=${link}>here</a> to reset your password!</p>`,
+        };
 
+        const result=await transport.sendMail(mailOptions)
+        return result;
+
+     } catch(error)
+     {
+        return error;
+     }
+}
+
+const JWT_SECRET="some super secret.....";
 
 //====================DATABASE CONNECTION==========================
 const dbUrl = "mongodb://localhost:27017/test";
@@ -454,6 +500,128 @@ app.get("/logout", (req, res) => {
   req.logout();
   req.flash("success", "Logged Out Successfully.");
   res.redirect("/signup");
+});
+
+//forgot and reset password
+app.get("/forgot-password",(req,res,next) =>{
+      res.render("forgot-password");
+});
+
+app.post("/forgot-password",(req,res,next) => {
+      (async()  => {
+        const{email}=req.body;
+        var flag=0; 
+        let user=await User.find();
+        try{
+      for(i=0;i<user.length;i++)
+      {
+          if(email===user[i].username)
+          {
+              flag=1;
+              pass=user[i].password;
+              em=user[i].username;
+              up=i;
+              req.flash("success","Password reset link sent!")
+              res.redirect("/signup");
+               //flash messages will be used for this
+              
+          }
+      }
+    }
+      catch(error){}
+        if(flag===0)
+        {  
+          req.flash("danger","Oops! You are not registered!")
+           return res.redirect("/signup");
+          //flash messages will be used for this
+        }
+            
+
+         const secret=JWT_SECRET + pass;
+         const payload={
+             email:em
+         }
+         const token=jwt.sign(payload,secret,{expiresIn:'15m'});
+         const link=`http://localhost:3000/reset-password/${token}`;
+         console.log(link);
+         try{
+          sendMail(link).then(result=>console.log("Email sent....",result));
+         } catch(error){
+             console.log(error.message);
+         }
+         
+    })();
+});
+app.get("/reset-password/:token",(req,res,next) =>{
+       
+      const{token}=req.params;
+      const secret=JWT_SECRET + pass;
+      try{
+          const payload=jwt.verify(token,secret);
+          res.render("reset-password",{email:em});
+      }
+      catch(error)
+      {
+        console.log(error.message);
+        res.send(error.message);
+      }
+
+});
+
+app.post("/reset-password/:token",(req,res,next) =>{
+  (async()  => {
+  const{token}=req.params;
+  const{email,new_password,confirm_password}=req.body;
+  const secret=JWT_SECRET + pass;
+
+  try{
+     const payload=jwt.verify(token,secret);
+  }
+  catch(error)
+  {
+     console.log(error.message)
+     res.send(error.message)
+  }
+       
+      if(new_password!==confirm_password)
+      {
+           req.flash("danger","Oops! Passwords do not match!");
+          return res.redirect("/signup");
+      }
+      else
+      {
+        var flag=0; 
+        let user=await User.find();
+
+        try{
+      for(i=0;i<user.length;i++)
+      {
+          if(email===user[i].username)
+          {
+             if(email===em)
+             {
+              flag=1;
+              user[i].password=new_password
+               //flash messages will be used for this
+                req.flash("success","Password has been reset successfully!");
+                res.redirect("/signup");
+
+             }
+          }
+      }
+    }
+       catch(error)
+       {}
+        if(flag===0)
+        {
+          //flash messages will be used for this
+          req.flash("danger","Oops! Email entered not registered/matched!");
+          return res.redirect("/signup");
+        }
+       
+      }
+          
+})();
 });
 
 

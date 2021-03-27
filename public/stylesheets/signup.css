@@ -1,20 +1,24 @@
 .searchbar {
-   width: 35rem!important;
+  width: 35rem !important;
 }
 
-.searchbar::placeholder{
-   font-weight: 300;
+.searchbar::placeholder {
+  font-weight: 300;
 }
 
 .tab {
   display: none;
+}
+
+.forgot {
+  margin-left: 147px;
 }
 .step {
   height: 15px;
   width: 15px;
   margin: 0 2px;
   background-color: #bbbbbb;
-  border: none;  
+  border: none;
   border-radius: 50%;
   display: inline-block;
   opacity: 0.5;
@@ -25,24 +29,24 @@
 }
 
 @media (max-width: 770px) {
-   .searchbar {
-      width: 15em!important;
-   }
+  .searchbar {
+    width: 15em !important;
+  }
 }
 
-@import url('https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900&display=swap');
+@import url("https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900&display=swap");
 
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
 }
 
 #section1 {
   position: relative;
   min-height: 100vh;
-  background-color: #1CC1E5;
+  background-color: #1cc1e5;
 
   background-image: url("https://i.pinimg.com/originals/0d/af/b7/0dafb7928a99a9cb552a941895a6e586.jpg");
   background-repeat: no-repeat;
@@ -90,8 +94,8 @@ section .container2 .user .imgBx img {
   object-fit: cover;
 }
 
-.imgBx img{
-	padding:40px;
+.imgBx img {
+  padding: 40px;
 }
 
 section .container2 .user .formBx {
@@ -132,7 +136,7 @@ section .container2 .user .formBx form input {
   font-weight: 300;
 }
 
-section .container2 .user .formBx form input[type='submit'] {
+section .container2 .user .formBx form input[type="submit"] {
   max-width: 100px;
   background: #677eff;
   color: #fff;
