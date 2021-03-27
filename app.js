@@ -534,21 +534,22 @@ app.post("/forgot-password",(req,res,next) => {
           req.flash("danger","Oops! You are not registered!")
            return res.redirect("/signup");
           //flash messages will be used for this
-        }
-            
-
+        }  
          const secret=JWT_SECRET + pass;
          const payload={
              email:em
          }
          const token=jwt.sign(payload,secret,{expiresIn:'15m'});
          const link=`http://localhost:3000/reset-password/${token}`;
-         console.log(link);
-         try{
-          sendMail(link).then(result=>console.log("Email sent....",result));
-         } catch(error){
-             console.log(error.message);
-         }
+         if(flag===1)
+         {
+          console.log(link);
+          try{
+           sendMail(link).then(result=>console.log("Email sent....",result));
+          } catch(error){
+              console.log(error.message);
+          }
+         }     
          
     })();
 });
