@@ -48,11 +48,9 @@ const REDIRECT_URI="https://developers.google.com/oauthplayground";
 const REFRESH_TOKEN="1//04CJnXCsgKx3hCgYIARAAGAQSNgF-L9IrLsnRQYMOsymeaeNpat3xRi2avvUiWxoEwYE-DqB729pQSCr29PNiv_Hvt5kiqbz8xw";
 const oAuth2Client=new google.auth.OAuth2(CLIENT_ID,CLIENT_SECRET,REDIRECT_URI)
 oAuth2Client.setCredentials({refresh_token:REFRESH_TOKEN})
-var em;
-var up;
-var pass; 
 
-async function sendMail(link)
+
+async function sendMail(receiver, link)
 { 
      try{
         const accessToken=await oAuth2Client.getAccessToken();
@@ -70,7 +68,7 @@ async function sendMail(link)
         
         const mailOptions={
           from:"EduConnect <shubh.gosalia@somaiya.edu>",
-          to:em,
+          to:receiver,
           subject:"EduConnect:Password Reset",
           text:`<p>Kindly Click <a href=${link}>here</a> to reset your password!</p>`,
           html:`<p>Kindly Click <a href=${link}>here</a> to reset your password!</p>`,
@@ -338,7 +336,7 @@ app.post("/upload", isLoggedIn, async (req, res) => {
 });
 
 app.get("/results", function (req, res) {
-  
+
   Document.find({}, function (err, docs) {
     if (err) {
       console.log(err);
@@ -503,127 +501,87 @@ app.get("/logout", (req, res) => {
 });
 
 //forgot and reset password
-app.get("/forgot-password",(req,res,next) =>{
+app.get("/forgot-password",(req,res) =>{
       res.render("forgot-password");
 });
 
-app.post("/forgot-password",(req,res,next) => {
+app.post("/forgot-password",(req,res) => {
       (async()  => {
         const{email}=req.body;
-        var flag=0; 
-        let user=await User.find();
         try{
-      for(i=0;i<user.length;i++)
-      {
-          if(email===user[i].username)
-          {
-              flag=1;
-              pass=user[i].password;
-              em=user[i].username;
-              up=i;
-              req.flash("success","Password reset link sent!")
-              res.redirect("/signup");
-               //flash messages will be used for this
-              
+          let foundUser=await User.findOne({username : email});      
+          if(foundUser){
+            const secret=JWT_SECRET;
+            const payload = {
+              email : foundUser.username
+            }
+            const token=jwt.sign(payload,secret,{expiresIn:'15m'});
+            const link=`http://localhost:3000/reset-password/${token}`;
+            req.flash("success","Password reset link sent!")
+            console.log(link);          
+            sendMail(email,link).then(result=>console.log("Email sent....",result));
+            res.redirect("/signup");
+          }else{
+            req.flash("danger","That email id is not registered!")
+            return res.redirect("/signup");
           }
-      }
-    }
-      catch(error){}
-        if(flag===0)
-        {  
-          req.flash("danger","Oops! You are not registered!")
-           return res.redirect("/signup");
-          //flash messages will be used for this
-        }  
-         const secret=JWT_SECRET + pass;
-         const payload={
-             email:em
-         }
-         const token=jwt.sign(payload,secret,{expiresIn:'15m'});
-         const link=`http://localhost:3000/reset-password/${token}`;
-         if(flag===1)
-         {
-          console.log(link);
-          try{
-           sendMail(link).then(result=>console.log("Email sent....",result));
-          } catch(error){
-              console.log(error.message);
-          }
-         }     
-         
+        }
+        catch(error){
+          console.log(error)
+        }          
     })();
 });
-app.get("/reset-password/:token",(req,res,next) =>{
-       
-      const{token}=req.params;
-      const secret=JWT_SECRET + pass;
-      try{
-          const payload=jwt.verify(token,secret);
-          res.render("reset-password",{email:em});
-      }
-      catch(error)
-      {
-        console.log(error.message);
-        res.send(error.message);
-      }
 
-});
-
-app.post("/reset-password/:token",(req,res,next) =>{
-  (async()  => {
+app.get("/reset-password/:token", async(req,res) =>{  
   const{token}=req.params;
-  const{email,new_password,confirm_password}=req.body;
-  const secret=JWT_SECRET + pass;
-
   try{
-     const payload=jwt.verify(token,secret);
+    const secret=JWT_SECRET;
+    const payload = jwt.verify(token,secret);      
+    const foundUser = await User.findOne({username : payload.email})
+    if(!foundUser) {
+      req.flash('danger', 'User not found!')
+      return res.redirect('/signup')
+    }  
+    res.render("reset-password.ejs", {token});
   }
   catch(error)
   {
-     console.log(error.message)
-     res.send(error.message)
+    console.log(error.message);
+    res.send(error.message);
   }
-       
-      if(new_password!==confirm_password)
-      {
-           req.flash("danger","Oops! Passwords do not match!");
-          return res.redirect("/signup");
-      }
-      else
-      {
-        var flag=0; 
-        let user=await User.find();
+});
 
-        try{
-      for(i=0;i<user.length;i++)
-      {
-          if(email===user[i].username)
-          {
-             if(email===em)
-             {
-              flag=1;
-              user[i].password=new_password
-               //flash messages will be used for this
-                req.flash("success","Password has been reset successfully!");
-                res.redirect("/signup");
-
-             }
-          }
-      }
-    }
-       catch(error)
-       {}
-        if(flag===0)
-        {
-          //flash messages will be used for this
-          req.flash("danger","Oops! Email entered not registered/matched!");
-          return res.redirect("/signup");
-        }
-       
+app.post("/reset-password/:token",(req,res) =>{
+  (async()  => {
+    const{token}=req.params;
+    try {
+      const secret=JWT_SECRET;
+      const payload = jwt.verify(token,secret);
+      const foundUser = await User.findOne({username : payload.email })
+      if(!foundUser) {
+        req.flash('danger', 'User not found!')
+        return res.redirect('/signup')
       }
           
-})();
+    const{new_password,confirm_password}=req.body;       
+    if(new_password.length > 0 && new_password === confirm_password){
+      
+        await foundUser.setPassword(new_password)
+        await foundUser.save()
+        req.flash("success","Password has been reset successfully!");
+        res.redirect("/signup");
+     
+    }else{
+      req.flash("danger","Oops! Passwords do not match!");
+      return res.redirect("back");
+    }
+  }catch (error) {
+    console.log(error.message);
+    res.send(error.message);
+  }
+  })();
 });
+
 
 
 const port = 3000;
