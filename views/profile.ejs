@@ -16,7 +16,13 @@
           <h1 class="profile-user-name"><%= currentUser.fullname %></h1>
           <div class="box row">
             <div class="wrapper col-md-2 col-6">
-              <img src="https://image.shutterstock.com/image-vector/profile-picture-vector-600w-404138239.jpg" alt="" class="image--cover" />
+              <form action="/uploadprofile" method="POST">
+                <i class="fa fa-camera upload-button"></i>
+                <input type="file" value="edit profile">
+                <br>
+                <input type="submit" value="reset profile" >                               
+             </form>
+              <img src="../profilePic/<%=currentUser.profilePic[0]%>" alt="" class="image--cover" />
             </div>
           </div>
           <br>

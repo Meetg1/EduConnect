@@ -42,6 +42,8 @@ const UserSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
+  profilePic : [String],
+
 });
 
 UserSchema.plugin(passportLocalMongoose);
