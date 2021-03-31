@@ -43,7 +43,7 @@ const DocumentSchema = new mongoose.Schema({
   },
   driveId : String,
   mimeType : String,
-  fileName : String,
+  fileName : String, 
   previewPics : [String],
   uploader : {                                            
     id : {
