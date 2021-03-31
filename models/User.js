@@ -41,8 +41,8 @@ const UserSchema = new mongoose.Schema({
   followers: {
     type: Number,
     default: 0,
-  },
-  profilePic : [String],
+  }, 
+  profilePic : String,
 
 });
 

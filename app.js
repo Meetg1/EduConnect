@@ -225,6 +225,7 @@ app.post("/uploadfile", upload1.single("file"), (req, res, next) => {
     error.httpStatusCode = 400;
     return next(error);
   }
+
   res.send(file);
 });
 
@@ -239,20 +240,34 @@ app.post("/uploadpics", upload2.single("file"), (req, res, next) => {
     error.httpStatusCode = 400;
     return next(error);
   }
+
   res.send(file);
 });
 
-var profilePicIds = [];
-app.post("/uploadprofile", upload3.single("file"), (req, res, next) => {
+var profilePicId;
+app.post("/uploadprofile", upload3.single("file"),async (req, res, next) => {
 
-  profilePicIds.push(req.file.filename);
-  // console.log(file);
+  //profilePicIds.push(req.file.filename);
+  try{
+
+  const user = await User.findById(req.user._id)
+    console.log(req.file);
+  file = req.file;
   if (!file) {
     const error = new Error("Please upload a file");
     error.httpStatusCode = 400;
     return next(error);
   }
-  res.send(file);
+
+  user.profilePic = req.file.filename;
+  user.save();
+  req.flash("success","Profile picture is updated");
+  return res.redirect('/users/'+user._id);
+  }
+
+  catch(error){}
+
+  
 });
 
 //============================================================
@@ -498,13 +513,11 @@ app.post("/register", async (req, res) => {
         username: username,
         fullname: fullname,
         university: university,
-        profilePic: profilePicIds
       });
       const registedUser = await User.register(user, password);
       console.log(registedUser);
       req.flash("success", "You are now registered");
       res.redirect("/signup");
-      profilePicIds=[];
     }
   } catch (error) {
     req.flash("danger", "That email is already registered!");
