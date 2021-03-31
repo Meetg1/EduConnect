@@ -16,13 +16,12 @@
           <h1 class="profile-user-name"><%= currentUser.fullname %></h1>
           <div class="box row">
             <div class="wrapper col-md-2 col-6">
+              <img src="../profilePic/<%=currentUser.profilePic %>" alt="" class="image--cover" />
               <form id="form_pic" action="/uploadprofile" method="POST" enctype="multipart/form-data">
-                <input type="file" name="file" value="edit profile">
-
-                <button type="submit"  class="next-step btn btn-primary">Reset</button>
+                  <input type="file" name="file" value="edit profile">
+                  <button type="submit" class="next-step btn btn-primary">Reset Pic</button>  
                 <br>                               
              </form>
-              <img src="../profilePic/<%=currentUser.profilePic %>" alt="" class="image--cover" />
             </div>
           </div>
           <br>
