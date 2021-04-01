@@ -590,9 +590,9 @@ app.delete('/single_material/:document_id', isLoggedIn, isUploader, async(req, r
     const pathToFile = path.join(__dirname, "public/previewPics", doc.previewPics[i])
     console.log("path : "+pathToFile)
     fs.unlink(pathToFile, function(err) {
-      if (err) {
+     if (err) {
         throw err
-      } else {
+     } else {
         console.log("Successfully deleted the file : " + pathToFile)
       }
     })    
