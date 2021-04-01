@@ -40,26 +40,8 @@ const drive = google.drive({
 
 //================DOWNLOADING FILE
 
-// const getFileFromDrive = async (fileId, fileName) => {
-//   console.log("here2")
-//   var dest = fs.createWriteStream(`./downloads/${fileName}`);
-
-//   const res = await drive.files.get(
-//     { fileId: fileId, alt: "media" },
-//     { responseType: "stream" })
-//     res.data
-//         .on("end", () => {
-//           console.log("Done");
-//         })
-//         .on("error", (err) => {
-//           console.log("Error", err);
-//         })
-//         .pipe(dest);
-
-// }
 
 async function getFileFromDrive(fileId, fileName) {
-  console.log("here2")
   const filePath = `./downloads/${fileName}`;
   const dest = fs.createWriteStream(filePath);
   let progress = 0;
@@ -116,6 +98,13 @@ const uploadToDrive = async (fileName, mime_type) => {
   }
 };
 
+const deleteFromDrive = (fileId) => {
+  drive.files.delete({
+    fileId: fileId
+  });
+}
+
+
 // const picToDrive = async (picName, mime_type) => {
 //   const folderId = "1J2lVVPUgNXGi2CXXb1V53aHY_ucKpvgZ";
 //   const fileMetadata = {
@@ -142,3 +131,4 @@ const uploadToDrive = async (fileName, mime_type) => {
 module.exports.uploadToDrive = uploadToDrive;
 //module.exports.picToDrive = picToDrive;
 module.exports.getFileFromDrive = getFileFromDrive;
+module.exports.deleteFromDrive = deleteFromDrive;

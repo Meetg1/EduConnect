@@ -17,11 +17,13 @@ const nodemailer=require("nodemailer");
 const {google}=require("googleapis");
 const {
   uploadToDrive,
-  getFileFromDrive
+  getFileFromDrive,
+  deleteFromDrive
 } = require("./driveApi.js");
 const expressValidator = require('express-validator');
 const { v1: uuidv1 } = require('uuid');
-const { PassThrough } = require("stream");
+const methodOverride = require('method-override')
+const fs = require("fs")
 
 
 
@@ -33,7 +35,9 @@ app.use(express.static(path.join(__dirname, "public"))); //for serving static fi
 app.use(express.urlencoded({
   extended: true
 })); //for parsing form data
+app.use(methodOverride('_method'));
 app.use(flash());
+
 
 app.use(
   session({
@@ -166,10 +170,20 @@ const checkReviewExistence = (req, res, next) => {
     }else{
       next()
     }
-
   })
+}
 
-
+const isUploader = async(req, res, next) => {
+  if (!req.isAuthenticated()) {
+    req.flash("danger", "Please Log In First!");
+    return res.redirect("/signup");
+  }
+  const doc = await Document.findById(req.params.document_id);
+  if(!doc.uploader.id.equals(req.user._id)){
+    req.flash('danger', 'You do not have permission to do that!');
+    return res.redirect('/results');
+  }
+  next();
 }
 
 //====================middlewares===================================
@@ -206,7 +220,7 @@ var upload2 = multer({
 var file;
 app.post("/uploadfile", upload1.single("file"), (req, res, next) => {
   file = req.file;
-  console.log(file);
+  // console.log(file);
   if (!file) {
     const error = new Error("Please upload a file");
     error.httpStatusCode = 400;
@@ -239,7 +253,6 @@ app.get('/download/:document_id', isLoggedIn,async (req, res) => {
       return res.redirect('/single_material/'+req.params.document_id)
     }
     const doc = await Document.findById(req.params.document_id);   
-    console.log("here")
     await getFileFromDrive(doc.driveId,doc.fileName)
     setTimeout(function(){ 
       res.download(__dirname +'/downloads/'+doc.fileName);
@@ -260,9 +273,9 @@ app.post("/upload", isLoggedIn, async (req, res) => {
   // console.log(req.body);
   try {
     const uploadedFile = await uploadToDrive(file.originalname, file.mimetype);
-    if (uploadedFile) {
-      console.log(uploadedFile);
-    }
+    // if (uploadedFile) {
+    //   console.log(uploadedFile);
+    // }
     
     const {
       university,
@@ -314,7 +327,7 @@ app.post("/upload", isLoggedIn, async (req, res) => {
       });
 
       const uploadedDoc = await doc.save()
-      console.log(uploadedDoc);
+      // console.log(uploadedDoc);
       const foundUser = await User.findById(req.user._id);
       foundUser.uploads = foundUser.uploads + 1;
       foundUser.points = foundUser.points + 20;
@@ -327,7 +340,20 @@ app.post("/upload", isLoggedIn, async (req, res) => {
       }
       foundUser.save();
       previewPicIds=[];
+
+      //deleting file from uploads folder
+      let pathToFile = path.join(__dirname, "uploads", doc.fileName) 
+      //console.log("path: "+pathToFile)          
+      fs.unlink(pathToFile, function(err) {
+        if (err) {
+          throw err
+        } else {
+          console.log("Successfully deleted the file : " + pathToFile)
+        }
+      })
     }
+
+    
 
 
   } catch (error) {
@@ -350,7 +376,6 @@ app.get("/results", function (req, res) {
 });
 
 app.post('/single_material/:document_id/reviews', isLoggedIn, checkReviewExistence, async (req, res) => {
-  console.log(req.body)
   const upvote = (req.body.upDown == 'upvote') ? true : false;
   const review = new Review({
     upvote: upvote,
@@ -444,6 +469,28 @@ app.get("/single_material/:document_id", async function (req, res) {
   res.render('single_material.ejs', { doc });
 
 });
+
+app.delete('/single_material/:document_id', isLoggedIn, isUploader, async(req, res) => {
+
+  const doc = await Document.findByIdAndDelete(req.params.document_id);
+  deleteFromDrive(doc.driveId)
+
+  //deleting file's previewPics
+  for(let i = 0 ; i < doc.previewPics.length;i++){
+    const pathToFile = path.join(__dirname, "public/previewPics", doc.previewPics[i])
+    console.log("path : "+pathToFile)
+    fs.unlink(pathToFile, function(err) {
+      if (err) {
+        throw err
+      } else {
+        console.log("Successfully deleted the file : " + pathToFile)
+      }
+    })    
+  }
+  
+  req.flash('success', 'Successfully deleted Document.')
+  res.redirect('/results');
+})
 
 app.post("/register", async (req, res) => {
   try {
