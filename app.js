@@ -26,6 +26,23 @@ const methodOverride = require('method-override')
 const fs = require("fs")
 
 
+//====================DATABASE CONNECTION==========================
+const dbUrl = "mongodb://localhost:27017/test";
+
+mongoose.connect(dbUrl, {
+  useNewUrlParser: true,
+  useCreateIndex: true,
+  useUnifiedTopology: true,
+});
+
+const db = mongoose.connection;
+db.on("error", console.error.bind(console, "database connection error:"));
+db.once("open", () => {
+  console.log("Database connected!!");
+});
+
+
+
 
 app.use(express.json());
 app.engine("ejs", ejsMate);
@@ -52,6 +69,8 @@ const REDIRECT_URI="https://developers.google.com/oauthplayground";
 const REFRESH_TOKEN="1//04CJnXCsgKx3hCgYIARAAGAQSNgF-L9IrLsnRQYMOsymeaeNpat3xRi2avvUiWxoEwYE-DqB729pQSCr29PNiv_Hvt5kiqbz8xw";
 const oAuth2Client=new google.auth.OAuth2(CLIENT_ID,CLIENT_SECRET,REDIRECT_URI)
 oAuth2Client.setCredentials({refresh_token:REFRESH_TOKEN})
+
+
 
 
 async function sendMail(receiver, link)
@@ -89,20 +108,7 @@ async function sendMail(receiver, link)
 
 const JWT_SECRET="some super secret.....";
 
-//====================DATABASE CONNECTION==========================
-const dbUrl = "mongodb://localhost:27017/test";
 
-mongoose.connect(dbUrl, {
-  useNewUrlParser: true,
-  useCreateIndex: true,
-  useUnifiedTopology: true,
-});
-
-const db = mongoose.connection;
-db.on("error", console.error.bind(console, "database connection error:"));
-db.once("open", () => {
-  console.log("Database connected!!");
-});
 //===================================================================
 
 //========================PASSPORT SETUP=============================
@@ -217,6 +223,19 @@ var upload2 = multer({
   storage: storage2
 });
 
+var storage3 = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, path.join(__dirname, "public/profilePic"))
+  },
+  filename: function (req, file, cb) {
+    cb(null, uuidv1() + path.extname(file.originalname));
+  }
+})
+
+var upload3 = multer({
+  storage: storage3
+});
+
 var file;
 app.post("/uploadfile", upload1.single("file"), (req, res, next) => {
   file = req.file;
@@ -226,6 +245,7 @@ app.post("/uploadfile", upload1.single("file"), (req, res, next) => {
     error.httpStatusCode = 400;
     return next(error);
   }
+
   res.send(file);
 });
 
@@ -240,8 +260,36 @@ app.post("/uploadpics", upload2.single("file"), (req, res, next) => {
     error.httpStatusCode = 400;
     return next(error);
   }
+
   res.send(file);
 });
+
+var profilePicId;
+app.post("/uploadprofile", upload3.single("file"),async (req, res, next) => {
+
+  //profilePicIds.push(req.file.filename);
+  try{
+
+  const user = await User.findById(req.user._id)
+    console.log(req.file);
+  file = req.file;
+  if (!file) {
+    const error = new Error("Please upload a file");
+    error.httpStatusCode = 400;
+    return next(error);
+  }
+
+  user.profilePic = req.file.filename;
+  user.save();
+  req.flash("success","Profile picture is updated");
+  return res.redirect('/users/'+user._id);
+  }
+
+  catch(error){}
+
+  
+});
+
 //============================================================
 
 app.get('/download/:document_id', isLoggedIn,async (req, res) => { 
@@ -373,6 +421,67 @@ app.get("/results", function (req, res) {
       });
     }
   });
+});
+
+app.post("/search", function(req, res){
+  var keyword = req.body.keyword;
+  console.log(keyword);
+  //keyword = search.toLowerCase();
+
+  Document.find({$or:[{"university":{ $regex : new RegExp(keyword, "i") }},
+                      {"course": { $regex : new RegExp(keyword, "i") }},
+                      {"title": { $regex : new RegExp(keyword, "i") }},
+                      {"topic": { $regex : new RegExp(keyword, "i") }}
+                      ]},
+                      function (err, docs) {
+    if (err) {
+      console.log(err);
+    } else {
+      res.render("results.ejs", {
+        docs: docs
+
+      });
+    }
+  });
+});
+
+
+app.get("/users/:user_id/stared", isLoggedIn, async(req, res)=>{
+    try{
+
+      const user = await User.findById(req.user._id);
+      console.log(user._id);
+      var docs=[]
+      for (var i = 0; i < user.stared.length; i++) {
+        const foundDoc = await Document.findById(user.stared[i]);
+        docs[i] = foundDoc;
+      }
+       res.render("stared.ejs", {
+            docs: docs
+          });
+
+
+    } catch(error){
+
+    }
+});
+
+
+app.post("/results/:document_id/star",  isLoggedIn,async (req, res) => {
+  try{
+     const user = await User.findById(req.user._id);  
+     const foundDoc = await Document.findById(req.params.document_id);
+     
+     user.stared.push(foundDoc._id);
+     console.log(user.stared);
+     user.save();
+     return res.redirect("/results");
+
+  } catch(error){
+      console.error(error);
+      return redirect("/results")
+  }
+
 });
 
 app.post('/single_material/:document_id/reviews', isLoggedIn, checkReviewExistence, async (req, res) => {

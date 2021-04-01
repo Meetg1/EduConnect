@@ -41,7 +41,10 @@ const UserSchema = new mongoose.Schema({
   followers: {
     type: Number,
     default: 0,
-  },
+  }, 
+  profilePic : String,
+  stared : [String],
+
 });
 
 UserSchema.plugin(passportLocalMongoose);
