@@ -583,6 +583,7 @@ app.delete('/single_material/:document_id', isLoggedIn, isUploader, async(req, r
 
   const doc = await Document.findByIdAndDelete(req.params.document_id);
   deleteFromDrive(doc.driveId)
+  await Review.deleteMany({ _id : {$in : doc.reviews} })
 
   //deleting file's previewPics
   for(let i = 0 ; i < doc.previewPics.length;i++){

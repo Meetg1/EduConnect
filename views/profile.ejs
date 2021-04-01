@@ -28,14 +28,15 @@
         <br>
         <div class="univ" href="#"><%= currentUser.university %></div>
         <div class="univ mt-2" href="#"><%= currentUser.username %></div>
+        <div class="profile-stats">
+          <ul class="pl-0">
+            <br>
+            <li><span class="profile-stat-count"><strong><%= currentUser.uploads %></strong></span> Uploads</li>
+            <li><span class="profile-stat-count"><strong><%= currentUser.followers %></strong></span> followers</li>
+          </ul>
+        </div>
       </div>
-      <div class="profile-stats">
-        <ul class="pl-0">
-          <br>
-          <li><span class="profile-stat-count"><strong><%= currentUser.uploads %></strong></span> Uploads</li>
-          <li><span class="profile-stat-count"><strong><%= currentUser.followers %></strong></span> followers</li>
-        </ul>
-      </div>
+      
     </div>
   </div>
   <div class="container pl-0">
