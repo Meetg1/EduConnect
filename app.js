@@ -409,23 +409,27 @@ app.post("/upload", isLoggedIn, async (req, res) => {
   }
 });
 
-app.get("/results", function (req, res) {
+app.get("/results", async(req, res) => {
 
-  Document.find({}, function (err, docs) {
-    if (err) {
-      console.log(err);
-    } else {
-      res.render("results.ejs", {
-        docs: docs
-
-      });
-    }
-  });
+  const docs = await Document.find({})
+  if(req.user) {
+    const user = await User.findById(req.user._id)
+    res.render("results.ejs", {
+      docs: docs,
+      stared : user.stared
+    });
+  }else {
+    res.render("results.ejs", {
+      docs: docs,
+    });
+  }
+  
 });
+
 
 app.post("/search", function(req, res){
   var keyword = req.body.keyword;
-  console.log(keyword);
+  //console.log(keyword);
   //keyword = search.toLowerCase();
 
   Document.find({$or:[{"university":{ $regex : new RegExp(keyword, "i") }},
@@ -473,40 +477,53 @@ app.post("/filter", function(req, res){
 
 app.get("/users/:user_id/stared", isLoggedIn, async(req, res)=>{
     try{
-
-      const user = await User.findById(req.user._id);
-      console.log(user._id);
-      var docs=[]
-      for (var i = 0; i < user.stared.length; i++) {
-        const foundDoc = await Document.findById(user.stared[i]);
-        docs[i] = foundDoc;
-      }
+      const user = await User.findById(req.user._id).populate("stared")     
        res.render("stared.ejs", {
-            docs: docs
-          });
-
-
+            docs: user.stared
+          });          
     } catch(error){
-
+      console.log(error)
     }
 });
 
 
-app.post("/results/:document_id/star",  isLoggedIn,async (req, res) => {
+app.post("/results/:document_id/addstar",  isLoggedIn, async(req, res) => {
   try{
      const user = await User.findById(req.user._id);  
-     const foundDoc = await Document.findById(req.params.document_id);
-     
-     user.stared.push(foundDoc._id);
-     console.log(user.stared);
+     const foundDoc = await Document.findById(req.params.document_id);     
+     user.stared.push(foundDoc);
      user.save();
+     req.flash('success', 'Document added to starred documents.')
      return res.redirect("/results");
 
   } catch(error){
       console.error(error);
       return redirect("/results")
   }
+});
 
+app.post("/results/:document_id/removestar",  isLoggedIn, async(req, res) => {
+  try{
+     const user = await User.findById(req.user._id);  
+
+     //removing the stared document from the user.stared array
+     let i = 0;
+     while(i < user.stared.length){
+       if(user.stared[i]==req.params.document_id){
+         break;
+       }
+       i++;
+     }
+     if (i > -1) {
+       user.stared.splice(i, 1);
+     }
+     user.save();
+     req.flash('success', 'Document removed from starred documents.')
+     return res.redirect("back");
+  } catch(error){
+      console.error(error);
+      return redirect("/results")
+  }
 });
 
 app.post('/single_material/:document_id/reviews', isLoggedIn, checkReviewExistence, async (req, res) => {
