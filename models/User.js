@@ -43,8 +43,10 @@ const UserSchema = new mongoose.Schema({
     default: 0,
   }, 
   profilePic : String,
-  stared : [String],
-
+  stared : [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Document"
+  }]
 });
 
 UserSchema.plugin(passportLocalMongoose);
