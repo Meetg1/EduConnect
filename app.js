@@ -449,6 +449,31 @@ app.post("/search", function(req, res){
   });
 });
 
+app.post("/filter", function(req, res){
+    var university = req.body.university;
+    var course = req.body.course;
+    var topic = req.body.topic;
+    var category = req.body.category;
+    console.log(university, course, topic, category);
+
+ Document.find({"university":{ $regex : new RegExp(university, "i") },
+                      "course": { $regex : new RegExp(course, "i") },
+                      "topic": { $regex : new RegExp(topic, "i") },
+                      "category": { $regex : new RegExp(category, "i") }
+                      },
+                      function (err, docs) {
+    if (err) {
+      console.log(err);
+    } else {
+      req.flash("success","Filter has been added. ");
+      res.render("results.ejs", {
+        docs: docs
+
+      });
+    }
+  });
+
+});
 
 app.get("/users/:user_id/stared", isLoggedIn, async(req, res)=>{
     try{
@@ -607,9 +632,9 @@ app.delete('/single_material/:document_id', isLoggedIn, isUploader, async(req, r
     const pathToFile = path.join(__dirname, "public/previewPics", doc.previewPics[i])
     console.log("path : "+pathToFile)
     fs.unlink(pathToFile, function(err) {
-      if (err) {
+     if (err) {
         throw err
-      } else {
+     } else {
         console.log("Successfully deleted the file : " + pathToFile)
       }
     })    

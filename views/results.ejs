@@ -9,34 +9,39 @@
 
   <body>
 
+<<<<<<< HEAD
     <%- include('partials/navbar')%>
     <%- messages('messages', locals) %>
 
     <div class="container m">
 
       <!-- <section class="filter_section">
+=======
+   <div class="container m " style="padding-top: 24px;">
+
+        <section class="filter_section">
+>>>>>>> 6a07cc43cd9c2ddec806f1a4a0fa6d491d7d5cfb
         
-        <form action="">
-          <div class="filter">
-            <label for="">filterName</label>
-            <input type="text">
-          </div>
-          <div class="filter">
-            <label for="">filterName</label>
-            <input type="text">
-          </div>
-          <div class="filter">
-            <label for="">filterName</label>
-            <input type="text">
-          </div>
-          <div class="filter">
-            <label for="">filterName</label>
-            <input type="text">
-          </div>
-          <button type="submit"></button>
+        <form action="/filter" method="POST">
+         
+            <label for="Course">Course</label>
+            <input type="text" name="course" style="margin-right: 7px;">
+          
+        
+            <label for="university">University</label>
+            <input type="text" name="university" style="margin-right: 7px;">
+          
+            <label for="topic">topic</label>
+            <input type="text" name="topic" style="margin-right: 7px;">
+          
+            <label for="category">category</label>
+            <input type="text" name="category" style="margin-right: 7px;">
+        
+          <button type="submit" style="align-content: center;">Add filter
+          </button>
         </form>
         
-      </section> -->
+      </section>
 
 
 
