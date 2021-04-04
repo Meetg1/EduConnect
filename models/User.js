@@ -53,6 +53,11 @@ const UserSchema = new mongoose.Schema({
   profilePic :{ 
     type: String,
     default: "stockPhoto.jpg"
+  }, 
+  usernameToken:String,
+  isVerified:{
+    type: Boolean,
+    default: false
   },
   stared : [{
     type: mongoose.Schema.Types.ObjectId,

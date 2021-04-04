@@ -23,10 +23,11 @@ const {
 } = require("./driveApi.js");
 const expressValidator = require('express-validator');
 const { v1: uuidv1 } = require('uuid');
-const methodOverride = require('method-override')
+const methodOverride = require('method-override');
 const fs = require("fs");
-
-
+require('dotenv').config();
+const sgMail=require("@sendgrid/mail");
+const crypto=require("crypto");
 
 //====================DATABASE CONNECTION==========================
 const dbUrl = "mongodb://localhost:27017/test";
@@ -204,6 +205,21 @@ const isUploader = async(req, res, next) => {
   next();
 }
 
+const isNotVerified=async function(req,res,next){
+     try{
+         const user=await User.findOne({username:req.body.username});
+         if(user.isVerified){
+             return next();
+         }
+         req.flash("danger","Your account has not been verified! Please check your email to verify your account.");
+         return res.redirect("/signup");
+     } catch(error){
+          console.log(error);
+          req.flash("danger","Something went wrong! Please contact us for assistance");
+          res.redirect("/signup");
+     }
+
+}
 //====================middlewares===================================
 
 //=======================MULTER=====================================
@@ -694,22 +710,75 @@ app.post("/register", async (req, res) => {
     } else {
       const user = new User({
         username: username,
+        usernameToken:crypto.randomBytes(64).toString("hex"),
+        isVerified:false,
         fullname: fullname,
         university: university,
       });
       const registedUser = await User.register(user, password);
       console.log(registedUser);
-      req.flash("success", "You are now registered");
-      res.redirect("/signup");
+      const msg=
+      {
+        from:"shubh.gosalia@somaiya.edu",
+        to:user.username,
+        subject:"EduConnect - Verify your email",
+        text:`Hello, thanks for registering on our site.Please copy and
+              paste the address below to verify your account.
+              http://${req.headers.host}/verify-email?token=${user.usernameToken}
+             `,
+        html:`
+                <h1>Hello,</h1>
+                <p>thanks for registering on our site.</p>
+                <p>Please click the link below to verify your account.</p>
+                <a href="http://${req.headers.host}/verify-email?token=${user.usernameToken}">Verify your account</a>
+             `          
+      }  
+      try
+      {
+          await sgMail.send(msg);
+          req.flash("success", "You are now registered. Please check your email to verify your account.");
+          res.redirect("/signup");
+      } catch(error)
+      {
+         console.log(error);
+         req.flash("danger","Something went wrong!");
+         res.redirect("/signup");
+      }
     }
   } catch (error) {
-    req.flash("danger", "That email is already registered!");
+    req.flash("danger", "That email is already registered! Please contact us for assistance.");
     return res.redirect("/signup")
   }
 
 });
 
-app.post("/login", (req, res, next) => {
+//Email verification route
+app.get("/verfiy-email",async(req,res,next) => {
+     try
+     {
+       const user=await User.findOne({usernameToken:req.query.token});
+       if(!user){
+          req.flash("danger","Token is invalid! Please contact us for assistance.");
+          return res.redirect("/signup");
+       }
+         user.usernameToken=null;
+         user.isVerified=true;
+         await user.save();
+         await req.login(user,async(err) => {
+               if(err) return next(err);
+               req.flash("success",`Welcome to EduConnect ${user.username}`);
+               const redirectUrl=req.session.redirectTo || "/signup";
+               delete req.session.redirectTo;
+               res.redirect(redirectUrl);
+         });
+     } catch(error){
+       console.log(error);
+       req.flash("danger","Token is invalid! Please contact us for assistance.");
+       res.redirect("/signup");
+     }
+});
+
+app.post("/login",isNotVerified, (req, res, next) => {
   passport.authenticate("local", {
     failureRedirect: "/signup",
     successRedirect: "/results",
