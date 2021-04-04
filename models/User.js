@@ -43,6 +43,9 @@ const UserSchema = new mongoose.Schema({
     default: 0,
   }, 
   profilePic : String,
+  username:String,
+  usernameToken:String,
+  isVerified:Boolean,
   stared : [{
     type: mongoose.Schema.Types.ObjectId,
     ref: "Document"
