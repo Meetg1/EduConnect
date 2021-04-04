@@ -8,31 +8,47 @@
 
 <body>
 
+  
+
+
   <%- include('partials/navbar')%>
+  <%- messages('messages', locals) %>
 
     <div class="jumbotron jumbotron-fluid">
       <div class="container">
         <div class="profile-user-settings">
-          <h1 class="profile-user-name"><%= currentUser.fullname %></h1>
+          <h1 class="profile-user-name"><%= user.fullname %></h1>
+          <%if(currentUser && !user._id.equals(currentUser._id)) { %>
+            <% if (user.followers.some(function(follower) {
+              return currentUser._id.equals(follower)
+            })){ %>
+              <a href="/users/<%=user._id%>/unfollow" class="btn btn-outline-primary followBtn">Unfollow</a>
+            <%}else{%>
+              <a href="/users/<%=user._id%>/follow" class="btn btn-outline-primary followBtn">Follow</a>
+            <%}%>
+          <% } %>
+          
           <div class="box row">
             <div class="wrapper col-md-2 col-6">
-              <img src="../profilePic/<%=currentUser.profilePic %>" alt="" class="image--cover" />
-              <form id="form_pic" action="/uploadprofile" method="POST" enctype="multipart/form-data">
-                  <input type="file" name="file" value="edit profile">
-                  <button type="submit" class="next-step btn btn-primary">Reset Pic</button>  
-                <br>                               
-             </form>
+              <img src="../profilePic/<%=user.profilePic %>" alt="" class="image--cover" />
+              <%if(currentUser && user._id.equals(currentUser._id)) { %>              
+                <form id="form_pic" action="/uploadprofile" method="POST" enctype="multipart/form-data">
+                    <input type="file" name="file" value="edit profile">
+                    <button type="submit" class="next-step btn btn-primary">Reset Pic</button>  
+                  <br>                               
+              </form>
+             <%}%>
             </div>
           </div>
         </div>
         <br>
-        <div class="univ" href="#"><%= currentUser.university %></div>
-        <div class="univ mt-2" href="#"><%= currentUser.username %></div>
+        <div class="univ" href="#"><%= user.university %></div>
+        <div class="univ mt-2" href="#"><%= user.username %></div>
         <div class="profile-stats">
           <ul class="pl-0">
             <br>
-            <li><span class="profile-stat-count"><strong><%= currentUser.uploads %></strong></span> Uploads</li>
-            <li><span class="profile-stat-count"><strong><%= currentUser.followers %></strong></span> followers</li>
+            <li><span class="profile-stat-count"><strong><%= user.uploads %></strong></span> Uploads</li>
+            <li><span class="profile-stat-count"><strong><%= user.followerCount %></strong></span> followers</li>
           </ul>
         </div>
       </div>
@@ -51,9 +67,9 @@
             </svg></h4>
           <hr>
           <div class="numBox">
-            <div class="num"><span><strong><%= currentUser.notes_uploads %></strong></span></div>
-            <div class="num"><span><strong><%= currentUser.papers_uploads %></strong></span></div>
-            <div class="num"><span><strong><%= currentUser.assignments_uploads %></strong></span></div>
+            <div class="num"><span><strong><%= user.notes_uploads %></strong></span></div>
+            <div class="num"><span><strong><%= user.papers_uploads %></strong></span></div>
+            <div class="num"><span><strong><%= user.assignments_uploads %></strong></span></div>
           </div>
           <div class="numBox">
             <div class="num ml-4 light"> notes</div>
@@ -70,7 +86,7 @@
             </svg></h4>
           <hr>
           <div class="numBox">
-            <div class="num"><span><strong><%= currentUser.points %></strong></span></div>
+            <div class="num"><span><strong><%= user.points %></strong></span></div>
           </div>
           <div class="numBox">
             <div class="num ml-2 light">total</div>
@@ -84,7 +100,7 @@
             </svg></h4>
           <hr>
           <div class="numBox">
-            <div class="num"><span><strong><%= currentUser.upvotes %></strong></span></div>
+            <div class="num"><span><strong><%= user.upvotes %></strong></span></div>
           </div>
           <div class="numBox">
             <div class="num ml-2 light">total</div>

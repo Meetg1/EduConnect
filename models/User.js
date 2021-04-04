@@ -38,14 +38,27 @@ const UserSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
-  followers: {
+  followerCount: {
     type: Number,
     default: 0,
+  },
+  followers : [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User"
+  }],
+  notifications : [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Notification"
+  }],
+  profilePic :{ 
+    type: String,
+    default: "stockPhoto.jpg"
   }, 
-  profilePic : String,
-  username:String,
   usernameToken:String,
-  isVerified:Boolean,
+  isVerified:{
+    type: Boolean,
+    default: false
+  },
   stared : [{
     type: mongoose.Schema.Types.ObjectId,
     ref: "Document"

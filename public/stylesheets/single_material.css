@@ -1,11 +1,9 @@
 .searchbar {
-  width: 35em !important;
+  width: 25em !important;
 }
 
-@media (max-width: 770px) {
-  .searchbar {
-    width: 15em !important;
-  }
+.searchbar::placeholder {
+  font-weight: 400;
 }
 
 .mySlides {
@@ -168,6 +166,12 @@ input[type="radio"]:checked~label {
 
   to {
     opacity: 1;
+  }
+}
+
+@media (max-width: 770px) {
+  .searchbar {
+    width: 15em !important;
   }
 }
 

@@ -3,7 +3,7 @@ html {
 }
 
 .searchbar {
-   width: 35rem !important;
+   width: 25rem !important;
 }
 
 .searchbar::placeholder {

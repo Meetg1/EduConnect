@@ -3,11 +3,11 @@ html {
 }
 
 .searchbar {
-  width: 35rem !important;
+  width: 25rem !important;
 }
 
 .searchbar::placeholder {
-  font-weight: 300;
+  font-weight: 400;
 }
 
 .results img {
@@ -34,15 +34,17 @@ html {
 #title_link {
   font-size: 1.6rem;
   font-weight: bold;
-  margin-top: -5px;
+  margin-right: 10px;
 }
 
 .material_type {
-  color: gray;
+  color: rgb(86, 86, 86);
   font-size: 0.75rem;
   padding: 3px;
   border: rgb(224, 224, 224) 2px solid;
   border-radius: 14px;
+  position: absolute;
+  top: 5px;
 }
 
 .date {
