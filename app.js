@@ -7,6 +7,7 @@ const mongoose = require("mongoose");
 const User = require("./models/user.js");
 const Document = require("./models/Document.js");
 const Review = require("./models/Review.js");
+const Notification = require("./models/Notification");
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
 const session = require("express-session");
@@ -23,7 +24,8 @@ const {
 const expressValidator = require('express-validator');
 const { v1: uuidv1 } = require('uuid');
 const methodOverride = require('method-override')
-const fs = require("fs")
+const fs = require("fs");
+
 
 
 //====================DATABASE CONNECTION==========================
@@ -122,8 +124,18 @@ passport.deserializeUser(User.deserializeUser());
 
 //Express Messages Middle ware
 app.use(require("connect-flash")());
-app.use(function (req, res, next) {
-  res.locals.currentUser = req.user; //giving access of loggedIn user to every templates(in views dir)
+app.use(async function (req, res, next) {
+  //giving access of loggedIn user to every templates(in views dir)
+  res.locals.currentUser = req.user; 
+  //giving access of loggedIn user's notifications to every templates(in views dir) (have to populate first though)
+  if(req.user){                       
+    try {
+      const user = await User.findById(req.user._id).populate('notifications').exec() 
+      res.locals.notifications = user.notifications.reverse()  //latest notifications first
+    } catch (error) {
+      console.error(error.message)
+    }   
+  }
   res.locals.messages = require("express-messages")(req, res);
   next();
 });
@@ -264,7 +276,7 @@ app.post("/uploadpics", upload2.single("file"), (req, res, next) => {
   res.send(file);
 });
 
-var profilePicId;
+
 app.post("/uploadprofile", upload3.single("file"),async (req, res, next) => {
 
   //profilePicIds.push(req.file.filename);
@@ -376,7 +388,7 @@ app.post("/upload", isLoggedIn, async (req, res) => {
 
       const uploadedDoc = await doc.save()
       // console.log(uploadedDoc);
-      const foundUser = await User.findById(req.user._id);
+      const foundUser = await User.findById(req.user._id).populate('followers').exec();
       foundUser.uploads = foundUser.uploads + 1;
       foundUser.points = foundUser.points + 20;
       if (doc.category == "Lecture Notes") {
@@ -388,6 +400,19 @@ app.post("/upload", isLoggedIn, async (req, res) => {
       }
       foundUser.save();
       previewPicIds=[];
+
+      //creating the notification body
+      let newNotification = {
+        username : foundUser.username,
+        documentId : doc.id
+      }
+      //pushing the notification into each follower
+      let followers = foundUser.followers
+      followers.forEach(async(follower) => {
+        let notification = await Notification.create(newNotification)
+        follower.notifications.push(notification)
+        await follower.save()       
+      })
 
       //deleting file from uploads folder
       let pathToFile = path.join(__dirname, "uploads", doc.fileName) 
@@ -572,7 +597,7 @@ app.get("/upload", isLoggedIn, (req, res) => {
   });
 });
 
-app.get("/users/:user_id", isLoggedIn, async (req, res) => {
+app.get("/users/:user_id", async (req, res) => {
   try {
     foundUser = await User.findById(req.params.user_id);
 
@@ -585,7 +610,8 @@ app.get("/users/:user_id", isLoggedIn, async (req, res) => {
           console.log(err);
         } else {
           res.render("profile.ejs", {
-            docs: docs
+            docs: docs,
+            user : foundUser
           });
         }
       });
@@ -623,9 +649,9 @@ app.get("/single_material/:document_id", async function (req, res) {
 
 app.delete('/single_material/:document_id', isLoggedIn, isUploader, async(req, res) => {
 
-  const doc = await Document.findByIdAndDelete(req.params.document_id);
-  deleteFromDrive(doc.driveId)
-  await Review.deleteMany({ _id : {$in : doc.reviews} })
+  const doc = await Document.findByIdAndDelete(req.params.document_id); //delete document from mongoDB
+  deleteFromDrive(doc.driveId) //delete document from drive
+  await Review.deleteMany({ _id : {$in : doc.reviews} }) //delete all reviews of the document
 
   //deleting file's previewPics
   for(let i = 0 ; i < doc.previewPics.length;i++){
@@ -781,7 +807,67 @@ app.post("/reset-password/:token",(req,res) =>{
   })();
 });
 
+//follow a user
+app.get('/users/:userId/follow', isLoggedIn, async(req,res) => {
+  const user = await User.findById(req.params.userId)
+  console.log(user)
+  if(!user){
+    req.flash('danger', 'User not found!')
+    return res.redirect('/results')
+  }  
+  user.followers.push(req.user._id)
+  user.followerCount++
+  req.flash('success', 'You started following '+ user.fullname +'.' )
+  user.save()
+  
+  res.redirect('back')
+})
 
+//unfollow a user
+app.get('/users/:userId/unfollow', isLoggedIn, async(req,res) => {
+  const user = await User.findById(req.params.userId)
+  console.log(user)
+  if(!user){
+    req.flash('danger', 'User not found!')
+    return res.redirect('/results')
+  }  
+  let i = 0;
+     while(i < user.followers.length){
+       if(user.followers[i].equals(req.user._id)){
+         break;
+       }
+       i++;
+     }
+     if (i > -1) {
+       user.followers.splice(i, 1);
+     }
+  user.followerCount--
+  user.save()
+  req.flash('success', `You unfollowed ${user.fullname}.`)
+  res.redirect('back')
+})
+
+// delete notification if it has been read(clicked)
+app.get('/notification/:notificationId', isLoggedIn, async(req, res) => {
+  try {
+    const user = await User.findById(req.user._id)
+    let noti = await Notification.findByIdAndDelete(req.params.notificationId)  
+    let i = 0;
+    while(i < user.notifications.length){
+      if(user.notifications[i].equals(req.params.notificationId)){
+        break;
+      }
+      i++;
+    }
+    if (i > -1) {
+      user.notifications.splice(i, 1);
+    }
+    user.save()  
+    return res.redirect(`/single_material/${noti.documentId}`)    
+  } catch (error) {
+    console.log(error.message)
+  }  
+})
 
 const port = 3000;
 

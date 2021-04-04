@@ -3,11 +3,11 @@ html {
 }
 
 .searchbar {
-  width: 35rem !important;
+  width: 25rem !important;
 }
 
 .searchbar::placeholder {
-  font-weight: 300;
+  font-weight: 400;
 }
 
 .uploadBox,
@@ -58,6 +58,11 @@ html {
   font-size: 3.2rem;
   font-weight: 300;
   color: #020202;
+}
+
+.followBtn {
+  margin-top: -25px;
+  margin-left: 10px;
 }
 
 .profile-stats li {
@@ -316,10 +321,12 @@ html {
     height: 230px;
   }
 }
+
 #form_pic {
   margin-top: -240px;
   margin-left: -180px;
 }
+
 .next-step {
   margin-left: -293px;
   margin-top: 90px;

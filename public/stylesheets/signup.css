@@ -1,11 +1,3 @@
-.searchbar {
-  width: 35rem !important;
-}
-
-.searchbar::placeholder {
-  font-weight: 300;
-}
-
 .tab {
   display: none;
 }
@@ -13,6 +5,7 @@
 .forgot {
   text-align: left;
 }
+
 .step {
   height: 15px;
   width: 15px;

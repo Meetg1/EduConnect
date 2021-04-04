@@ -38,11 +38,22 @@ const UserSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
-  followers: {
+  followerCount: {
     type: Number,
     default: 0,
-  }, 
-  profilePic : String,
+  },
+  followers : [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User"
+  }],
+  notifications : [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Notification"
+  }],
+  profilePic :{ 
+    type: String,
+    default: "stockPhoto.jpg"
+  },
   stared : [{
     type: mongoose.Schema.Types.ObjectId,
     ref: "Document"
