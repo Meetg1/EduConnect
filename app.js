@@ -26,8 +26,6 @@ const methodOverride = require('method-override');
 const fs = require("fs");
 require('dotenv').config();
 const sgMail=require("@sendgrid/mail");
-var SENDGRID_API_KEY='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';
-sgMail.setApiKey(SENDGRID_API_KEY);
 const crypto=require("crypto");
 
 //====================DATABASE CONNECTION==========================
