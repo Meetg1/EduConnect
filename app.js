@@ -25,10 +25,10 @@ const expressValidator = require('express-validator');
 const { v1: uuidv1 } = require('uuid');
 const methodOverride = require('method-override');
 const fs = require("fs");
-require('dotenv').config();
-const sgMail=require("@sendgrid/mail");
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-const crypto=require("crypto");
+//require('dotenv').config();
+//const sgMail=require("@sendgrid/mail");
+//sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+//const crypto=require("crypto");
 
 //====================DATABASE CONNECTION==========================
 const dbUrl = "mongodb://localhost:27017/test";
@@ -110,8 +110,42 @@ async function sendMail(receiver, link)
      }
 }
 
-const JWT_SECRET="some super secret.....";
+async function sendverifyMail(receiver, link)
+{ 
+     try{
+        const accessToken=await oAuth2Client.getAccessToken();
+        const transport=nodemailer.createTransport({
+            service:"gmail",
+            auth:{
+              type:"OAuth2",
+              user:"shubh.gosalia@somaiya.edu",
+              clientId:CLIENT_ID,
+              clientSecret:CLIENT_SECRET,
+              refreshToken:REFRESH_TOKEN,
+              accessToken:accessToken
+            }
+        })
+        
+        const mailOptions={
+          from:"EduConnect <shubh.gosalia@somaiya.edu>",
+          to:receiver,
+          subject:"EduConnect:Verify Your Email",
+          text:`<p>Kindly Click <a href=${link}>here</a> to verify your e-mail!</p>`,
+          html:`<p>Kindly Click <a href=${link}>here</a> to verify your e-mail!</p>`,
+        };
 
+        const result=await transport.sendMail(mailOptions)
+        return result;
+
+     } catch(error)
+     {
+        return error;
+     }
+}
+
+
+const JWT_SECRET="some super secret.....";
+const JWT_SECRET2="really very secret.....";
 
 //===================================================================
 
@@ -211,15 +245,14 @@ const isNotVerified=async function(req,res,next){
          const user=await User.findOne({username:req.body.username});
          if(user.isVerified){
              return next();
-         }
-         req.flash("danger","Your account has not been verified! Please check your email to verify your account.");
-         return res.redirect("/signup");
-     } catch(error){
-          console.log(error);
+        }
+       req.flash("danger","Your account has not been verified! Please check your email to verify your account.");
+        return res.redirect("/signup");
+    } catch(error){
+        console.log(error);
           req.flash("danger","Something went wrong! Please contact us for assistance");
-          res.redirect("/signup");
+         res.redirect("/signup");
      }
-
 }
 //====================middlewares===================================
 
@@ -711,67 +744,49 @@ app.post("/register", async (req, res) => {
     } else {
       const user = new User({
         username: username,
-        usernameToken:crypto.randomBytes(64).toString("hex"),
+        //usernameToken:crypto.randomBytes(64).toString("hex"),
         isVerified:false,
         fullname: fullname,
         university: university,
       });
       const registedUser = await User.register(user, password);
       console.log(registedUser);
-      const msg=
-      {
-        from:"shubh.gosalia@somaiya.edu",
-        to:user.username,
-        subject:"EduConnect - Verify your email",
-        text:`Hello, thanks for registering on our site.Please copy and
-              paste the address below to verify your account.
-              http://${req.headers.host}/verify-email?token=${user.usernameToken}
-             `,
-        html:`
-                <h1>Hello,</h1>
-                <p>thanks for registering on our site.</p>
-                <p>Please click the link below to verify your account.</p>
-                <a href="http://${req.headers.host}/verify-email?token=${user.usernameToken}">Verify your account</a>
-             `          
-      }  
-      try
-      {
-          await sgMail.send(msg);
-          req.flash("success", "You are now registered. Please check your email to verify your account.");
-          res.redirect("/signup");
-      } catch(error)
-      {
-         console.log(error);
-         req.flash("danger","Something went wrong!");
-         res.redirect("/signup");
+
+      const secret=JWT_SECRET2;
+      const payload = {
+        username : user.username
       }
+      const token=jwt.sign(payload,secret,{expiresIn:'15m'});
+      const link=`http://localhost:3000/verify-email/${token}`;
+      req.flash("success","You are now registered! Please verify your account through mail.")
+      console.log(link);          
+      sendverifyMail(username,link).then(result=>console.log("Email sent....",result));
+      res.redirect("/signup");
+
     }
   } catch (error) {
-    req.flash("danger", "That email is already registered! Please contact us for assistance.");
-    return res.redirect("/signup")
-  }
+    req.flash("danger","Email is already registered!");
+    return res.redirect("/signup");
+}
 
 });
 
 //Email verification route
-app.get("/verfiy-email",async(req,res,next) => {
+app.get("/verfiy-email/:token",async(req,res,next) => {
+  const{token}=req.params;
+
      try
      {
-       const user=await User.findOne({usernameToken:req.query.token});
+      const secret=JWT_SECRET2;
+      const payload = jwt.verify(token,secret);        
+       const user=await User.findOne({username:payload.username});
        if(!user){
           req.flash("danger","Token is invalid! Please contact us for assistance.");
           return res.redirect("/signup");
        }
-         user.usernameToken=null;
-         user.isVerified=true;
-         await user.save();
-         await req.login(user,async(err) => {
-               if(err) return next(err);
-               req.flash("success",`Welcome to EduConnect ${user.username}`);
-               const redirectUrl=req.session.redirectTo || "/signup";
-               delete req.session.redirectTo;
-               res.redirect(redirectUrl);
-         });
+       
+        res.render("verify-email.ejs", {token});
+  
      } catch(error){
        console.log(error);
        req.flash("danger","Token is invalid! Please contact us for assistance.");
@@ -937,7 +952,7 @@ app.get('/notification/:notificationId', isLoggedIn, async(req, res) => {
   } catch (error) {
     console.log(error.message)
   }  
-})
+});
 
 const port = 3000;
 
