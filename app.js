@@ -25,10 +25,7 @@ const expressValidator = require('express-validator');
 const { v1: uuidv1 } = require('uuid');
 const methodOverride = require('method-override');
 const fs = require("fs");
-//require('dotenv').config();
-//const sgMail=require("@sendgrid/mail");
-//sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-//const crypto=require("crypto");
+const crypto=require("crypto");
 
 //====================DATABASE CONNECTION==========================
 const dbUrl = "mongodb://localhost:27017/test";
@@ -145,7 +142,7 @@ async function sendverifyMail(receiver, link)
 
 
 const JWT_SECRET="some super secret.....";
-const JWT_SECRET2="really very secret.....";
+
 
 //===================================================================
 
@@ -744,7 +741,7 @@ app.post("/register", async (req, res) => {
     } else {
       const user = new User({
         username: username,
-        //usernameToken:crypto.randomBytes(64).toString("hex"),
+        usernameToken:crypto.randomBytes(64).toString("hex"),
         isVerified:false,
         fullname: fullname,
         university: university,
@@ -752,12 +749,12 @@ app.post("/register", async (req, res) => {
       const registedUser = await User.register(user, password);
       console.log(registedUser);
 
-      const secret=JWT_SECRET2;
+      const secret=JWT_SECRET;
       const payload = {
         username : user.username
       }
       const token=jwt.sign(payload,secret,{expiresIn:'15m'});
-      const link=`http://localhost:3000/verify-email/${token}`;
+      const link=`http://localhost:3000/verify-email/?token=${user.usernameToken}`;
       req.flash("success","You are now registered! Please verify your account through mail.")
       console.log(link);          
       sendverifyMail(username,link).then(result=>console.log("Email sent....",result));
@@ -766,27 +763,30 @@ app.post("/register", async (req, res) => {
     }
   } catch (error) {
     req.flash("danger","Email is already registered!");
-    return res.redirect("/signup");
-}
+    res.redirect("/signup");
+  }
 
 });
 
 //Email verification route
-app.get("/verfiy-email/:token",async(req,res,next) => {
-  const{token}=req.params;
-
+app.get("/verify-email",async(req,res,next) => {
      try
      {
-      const secret=JWT_SECRET2;
-      const payload = jwt.verify(token,secret);        
-       const user=await User.findOne({username:payload.username});
+       const user=await User.findOne({usernameToken:req.query.token});
        if(!user){
           req.flash("danger","Token is invalid! Please contact us for assistance.");
           return res.redirect("/signup");
        }
-       
-        res.render("verify-email.ejs", {token});
-  
+         user.usernameToken=null;
+         user.isVerified=true;
+         await user.save();
+         await req.login(user,async(err) => {
+               if(err) return next(err);
+               req.flash("success",`Welcome to EduConnect ${user.username}`);
+               const redirectUrl=req.session.redirectTo || "/signup";
+               delete req.session.redirectTo;
+               res.redirect(redirectUrl);
+         });
      } catch(error){
        console.log(error);
        req.flash("danger","Token is invalid! Please contact us for assistance.");
