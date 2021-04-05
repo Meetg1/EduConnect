@@ -1,7 +1,7 @@
 node_modules/
 credentials.json
+.env
 downloads
+uploads
 public/previewPics
 public/profilePic
-uploads"sendgrid.env" 
-"sendgrid.env" 

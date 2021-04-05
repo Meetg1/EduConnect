@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+require('dotenv').config()
 const path = require("path");
 const ejsMate = require("ejs-mate");
 const courses = require("./courses")
@@ -64,10 +65,12 @@ app.use(
     saveUninitialized: true,
   })
 );
-const CLIENT_ID="465802909834-papgnv7ostf26usmh27gehb3nnt4egjs.apps.googleusercontent.com";
-const CLIENT_SECRET="HM0fboBEXtUmqHiT8XDk0NA2";
-const REDIRECT_URI="https://developers.google.com/oauthplayground";
-const REFRESH_TOKEN="1//04CJnXCsgKx3hCgYIARAAGAQSNgF-L9IrLsnRQYMOsymeaeNpat3xRi2avvUiWxoEwYE-DqB729pQSCr29PNiv_Hvt5kiqbz8xw";
+
+const CLIENT_ID=process.env.CLIENT_ID
+const CLIENT_SECRET=process.env.CLIENT_SECRET
+const REDIRECT_URI=process.env.REDIRECT_URI
+const REFRESH_TOKEN=process.env.REFRESH_TOKEN
+
 const oAuth2Client=new google.auth.OAuth2(CLIENT_ID,CLIENT_SECRET,REDIRECT_URI)
 oAuth2Client.setCredentials({refresh_token:REFRESH_TOKEN})
 
@@ -141,7 +144,7 @@ async function sendverifyMail(receiver, link)
 }
 
 
-const JWT_SECRET="some super secret.....";
+const JWT_SECRET=process.env.JWT_SECRET;
 
 
 //===================================================================
@@ -237,19 +240,23 @@ const isUploader = async(req, res, next) => {
   next();
 }
 
-const isNotVerified=async function(req,res,next){
-     try{
-         const user=await User.findOne({username:req.body.username});
-         if(user.isVerified){
-             return next();
-        }
-       req.flash("danger","Your account has not been verified! Please check your email to verify your account.");
-        return res.redirect("/signup");
-    } catch(error){
-        console.log(error);
-          req.flash("danger","Something went wrong! Please contact us for assistance");
-         res.redirect("/signup");
-     }
+const isVerified=async function(req,res,next){
+  try{
+    const user=await User.findOne({username:req.body.username});
+    if(!user) {
+      req.flash("danger", "No account with that email exists.")
+      return res.redirect('/signup')
+    }
+    if(user.isVerified){
+        return next();
+    }
+    req.flash("danger","Your account has not been verified! Please check your email to verify your account.");
+    return res.redirect("/signup");
+  }catch(error){
+    console.log(error);
+    req.flash("danger","Something went wrong! Please contact us for assistance");
+    res.redirect("/signup");
+  }
 }
 //====================middlewares===================================
 
@@ -770,31 +777,25 @@ app.post("/register", async (req, res) => {
 
 //Email verification route
 app.get("/verify-email",async(req,res,next) => {
-     try
-     {
-       const user=await User.findOne({usernameToken:req.query.token});
-       if(!user){
-          req.flash("danger","Token is invalid! Please contact us for assistance.");
-          return res.redirect("/signup");
-       }
-         user.usernameToken=null;
-         user.isVerified=true;
-         await user.save();
-         await req.login(user,async(err) => {
-               if(err) return next(err);
-               req.flash("success",`Welcome to EduConnect ${user.username}`);
-               const redirectUrl=req.session.redirectTo || "/signup";
-               delete req.session.redirectTo;
-               res.redirect(redirectUrl);
-         });
-     } catch(error){
-       console.log(error);
-       req.flash("danger","Token is invalid! Please contact us for assistance.");
-       res.redirect("/signup");
-     }
+  try{
+    const user=await User.findOne({usernameToken:req.query.token});
+    if(!user){
+      req.flash("danger","Token is invalid! Please contact us for assistance.");
+      return res.redirect("/signup");
+    }
+    user.usernameToken=null;
+    user.isVerified=true;
+    await user.save();
+    req.flash('success', 'Email verified successfully!')
+    res.redirect('/signup')
+  } catch(error){
+    console.log(error);
+    req.flash("danger","Token is invalid! Please contact us for assistance.");
+    res.redirect("/signup");
+  }
 });
 
-app.post("/login",isNotVerified, (req, res, next) => {
+app.post("/login",isVerified, (req, res, next) => {
   passport.authenticate("local", {
     failureRedirect: "/signup",
     successRedirect: "/results",
