@@ -18,9 +18,10 @@ const DocumentSchema = new mongoose.Schema({
     required: true,
   },
   date: {
-    type: String,
-    required: true,
+    type: Date,
+    default: Date.now
   },
+  year : String,
   topic: {
     type: String,
     required: true,
