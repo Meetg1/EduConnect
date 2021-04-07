@@ -21,7 +21,6 @@ img {
   margin: auto;
 }
 
-
 /* Next & previous buttons */
 .prev,
 .next {
@@ -128,8 +127,8 @@ label {
   height: 100%;
   width: 100%;
   cursor: pointer;
-  opacity: .3;
-  transition: all .2s ease-in-out;
+  opacity: 0.3;
+  transition: all 0.2s ease-in-out;
 }
 
 /* Input style */
@@ -140,14 +139,13 @@ input[type="radio"] {
   height: 0;
 }
 
-input[type="radio"]:active~label {
+input[type="radio"]:active ~ label {
   opacity: 1;
 }
 
-input[type="radio"]:checked~label {
+input[type="radio"]:checked ~ label {
   opacity: 1;
 }
-
 
 @-webkit-keyframes fade {
   from {
@@ -177,10 +175,18 @@ input[type="radio"]:checked~label {
 
 /* On smaller screens, decrease text size */
 @media only screen and (max-width: 300px) {
-
   .prev,
   .next,
   .text {
     font-size: 11px;
   }
+}
+
+#call {
+  outline: none !important;
+  box-shadow: none !important;
+}
+button:focus {
+  border: none;
+  outline: none;
 }

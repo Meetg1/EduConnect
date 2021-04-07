@@ -227,6 +227,29 @@ const checkReviewExistence = (req, res, next) => {
   })
 }
 
+const checkReportExistence = (req, res, next) => {
+  if (!req.isAuthenticated()) {
+    req.flash("danger", "Please Log In First!");
+    return res.redirect("/signup");
+  }
+  Document.findById(req.params.document_id).populate('reported').exec(function(err, foundDoc){
+   if(!foundDoc || err) {
+      console.log(err)
+       return res.redirect('/results')
+    }
+    const foundReport = foundDoc.reported.some(function(reported) {
+      return reported.author.equals(req.user._id)
+    })
+    if(foundReport){
+      req.flash('danger', 'You have already reported this document!')
+      res.redirect('/single_material/'+req.params.document_id)
+    }
+    else{
+      next()
+    }
+  })
+}
+
 const isUploader = async(req, res, next) => {
   if (!req.isAuthenticated()) {
     req.flash("danger", "Please Log In First!");
@@ -605,6 +628,36 @@ app.post("/results/:document_id/removestar",  isLoggedIn, async(req, res) => {
   }
 });
 
+app.post('/single_material/:document_id/report',isLoggedIn,checkReportExistence,async(req,res)=>{
+
+  const foundDoc = await Document.findById(req.params.document_id);
+  foundDoc.reports++;
+  console.log(foundDoc.reports);
+  if(foundDoc.reports<5)
+  {
+    req.flash('danger', 'Document reported!'); 
+    res.redirect("/single_material/"+req.params.document_id);
+  }
+ 
+   else if(foundDoc.reports==5)
+    {
+      req.flash('danger', 'Document has extended the report limit! Permanently taken down!'); 
+      res.redirect("/results");
+
+    }
+
+    foundDoc.save();
+    await reporter.save();
+    await foundDoc.save();
+    await user.save();
+  
+
+});
+
+app.get("/taken-down/:document_id", (req, res) => {
+  res.render("taken-down.ejs");
+});
+
 app.post('/single_material/:document_id/reviews', isLoggedIn, checkReviewExistence, async (req, res) => {
   const upvote = (req.body.upDown == 'upvote') ? true : false;
   const review = new Review({
@@ -615,6 +668,7 @@ app.post('/single_material/:document_id/reviews', isLoggedIn, checkReviewExisten
 
   const foundDoc = await Document.findById(req.params.document_id);
   const docOwner = await User.findById(foundDoc.uploader.id);
+
   if(review.upvote){
       console.log("upvote done");
       foundDoc.upvotes++; 
@@ -693,6 +747,7 @@ app.get("/single_material/:document_id", async function (req, res) {
       path: 'author'
     }
   }).populate('author');
+
   if (!doc) {
     req.flash('danger', 'Cannot find that document!');
     return res.redirect('/results');
