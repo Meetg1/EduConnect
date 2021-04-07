@@ -447,12 +447,14 @@ app.post("/upload", isLoggedIn, async (req, res) => {
         id: req.user._id,
         username: req.user.username
       }
+      let year = date.slice(0,4)
       const doc = new Document({
         university: university,
         course: course,
         title: title,
         category: category,
         date: date,
+        year: year,
         topic: topic,
         num_pages: num_pages,
         description: description,
@@ -462,6 +464,7 @@ app.post("/upload", isLoggedIn, async (req, res) => {
         fileName: file.originalname,
         previewPics: previewPicIds
       });
+      
 
       const uploadedDoc = await doc.save()
       // console.log(uploadedDoc);
@@ -553,14 +556,14 @@ app.post("/search", function(req, res){
 
 app.post("/filter", function(req, res){
     var university = req.body.university;
-    var course = req.body.course;
-    var topic = req.body.topic;
+    var course = req.body.course;    
+    var year = req.body.year    
     var category = req.body.category;
-    console.log(university, course, topic, category);
+    console.log(university, course, year, category);
 
  Document.find({"university":{ $regex : new RegExp(university, "i") },
                       "course": { $regex : new RegExp(course, "i") },
-                      "topic": { $regex : new RegExp(topic, "i") },
+                      "year": { $regex : new RegExp(year, "i") },
                       "category": { $regex : new RegExp(category, "i") }
                       },
                       function (err, docs) {

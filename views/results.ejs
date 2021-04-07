@@ -17,21 +17,31 @@
        <section class="filter_section mt-5">
         
         <form action="/filter" method="POST">
-         
-            <label for="Course">Course</label>
-            <input type="text" name="course" style="margin-right: 7px;">
-          
-        
-            <label for="university">University</label>
-            <input type="text" name="university" style="margin-right: 7px;">
-          
-            <label for="topic">topic</label>
-            <input type="text" name="topic" style="margin-right: 7px;">
-          
-            <label for="category">category</label>
-            <input type="text" name="category" style="margin-right: 7px;">
-        
-          <button type="submit" style="align-content: center;">Add filter
+          <div class="row">
+            <div class="filterBox col-lg-3 mb-3">
+              <label class="d-block"  for="university">University filter</label>
+              <input type="text" class="form-control" name="university" style="width: inherit;" placeholder="Filter by university">
+            </div>
+            <div class="filterBox col-lg-3 mb-3">
+              <label class="d-block"  for="Course">Course filter</label>
+              <input type="text" class="form-control" name="course" style="width: inherit;" placeholder="Filter by course">       
+            </div>
+            <div class="filterBox col-lg-3 mb-3">
+              <label class="d-block"  for="topic">Year filter</label>
+              <input type="text" class="form-control" name="year" style="width: inherit;" placeholder="Filter by year"> 
+            </div>
+            <div class="filterBox col-lg-3 mb-3">
+              <label class="d-block"  for="category">Category filter</label>
+              <select class="custom-select form-control" name="category">
+                <option selected value="">Filter by university</option>
+                <option value="Lecture Notes">Lecture Notes</option>
+                <option value="Question Paper">Question Paper</option>
+                <option value="Assignment">Assignment</option>
+              </select>
+              
+            </div>
+          </div>   
+          <button type="submit" class="btn btn-outline-primary">Add filters
           </button>
         </form>
         
@@ -80,7 +90,7 @@
                         d="M11 6.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm-3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm-5 3a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1z" />
                       <path
                         d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z" />
-                    </svg> <%= doc.date %>
+                    </svg> <%= doc.date.getDate()%>/<%= doc.date.getMonth()%>/<%= doc.date.getFullYear()%>
                   </span>
                   <span>
                     <%= doc.upvotes  %><svg class="text-success" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
