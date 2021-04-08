@@ -42,16 +42,10 @@ const DocumentSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  reports:{
-     type:Number,
-     default:0,
-  },
-  reported:[{
+  reporters:[{
     type: mongoose.Schema.Types.ObjectId,
     ref: "User"
-
-  }],
- 
+  }], 
   driveId : String,
   mimeType : String,
   fileName : String, 

@@ -227,27 +227,27 @@ const checkReviewExistence = (req, res, next) => {
   })
 }
 
-const checkReportExistence = (req, res, next) => {
+const checkReportExistence = async(req, res, next) => {
   if (!req.isAuthenticated()) {
     req.flash("danger", "Please Log In First!");
     return res.redirect("/signup");
   }
-  Document.findById(req.params.document_id).populate('reported').exec(function(err, foundDoc){
-   if(!foundDoc || err) {
-      console.log(err)
-       return res.redirect('/results')
+  try {
+    const foundDoc = await Document.findById(req.params.document_id)
+    if(!foundDoc) {    
+      return res.redirect('/results')
     }
-    const foundReport = foundDoc.reported.some(function(reported) {
-      return reported.author.equals(req.user._id)
+    const foundReport = foundDoc.reporters.some(function(reporter) {
+      return reporter.equals(req.user._id)
     })
     if(foundReport){
       req.flash('danger', 'You have already reported this document!')
-      res.redirect('/single_material/'+req.params.document_id)
+      return res.redirect('/single_material/'+req.params.document_id)
     }
-    else{
-      next()
-    }
-  })
+    next()
+  } catch (error) {
+    console.log(err)
+  }      
 }
 
 const isUploader = async(req, res, next) => {
@@ -631,29 +631,20 @@ app.post("/results/:document_id/removestar",  isLoggedIn, async(req, res) => {
   }
 });
 
-app.post('/single_material/:document_id/report',isLoggedIn,checkReportExistence,async(req,res)=>{
+app.post('/single_material/:document_id/report',isLoggedIn, checkReportExistence ,async(req,res)=>{
 
   const foundDoc = await Document.findById(req.params.document_id);
-  foundDoc.reports++;
-  console.log(foundDoc.reports);
-  if(foundDoc.reports<5)
-  {
-    req.flash('danger', 'Document reported!'); 
+  const user = await User.findById(req.user._id);
+  foundDoc.reporters.push(user)
+  console.log(foundDoc.reporters.length);
+  if(foundDoc.reporters.length<5){
+    req.flash('danger', 'Document has been reported!'); 
     res.redirect("/single_material/"+req.params.document_id);
+  }else if(foundDoc.reporters.length>=5){
+    req.flash('danger', 'Document has extended the report limit! Permanently taken down!'); 
+    res.redirect("/results");
   }
- 
-   else if(foundDoc.reports==5)
-    {
-      req.flash('danger', 'Document has extended the report limit! Permanently taken down!'); 
-      res.redirect("/results");
-
-    }
-
     foundDoc.save();
-    await reporter.save();
-    await foundDoc.save();
-    await user.save();
-  
 
 });
 
@@ -751,9 +742,13 @@ app.get("/single_material/:document_id", async function (req, res) {
     }
   }).populate('author');
 
+
   if (!doc) {
     req.flash('danger', 'Cannot find that document!');
     return res.redirect('/results');
+  }
+  if(doc.reporters.length>=5){
+    res.render('taken-down.ejs');
   }
   res.render('single_material.ejs', { doc });
 
