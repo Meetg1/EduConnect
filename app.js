@@ -9,6 +9,7 @@ const User = require("./models/user.js");
 const Document = require("./models/Document.js");
 const Review = require("./models/Review.js");
 const Notification = require("./models/Notification");
+const Stat = require("./models/Stat");
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
 const session = require("express-session");
@@ -281,6 +282,36 @@ const isVerified=async function(req,res,next){
     res.redirect("/signup");
   }
 }
+
+const isAdmin = async(req, res, next) => {
+  if (!req.isAuthenticated()) {
+    req.flash("danger", "Please Log In First!");
+    return res.redirect("/signup");
+  }
+  try {
+    const user = await User.findById(req.user._id)
+    if(!user.isAdmin){
+      req.flash("danger", "You are not an admin!")
+      return res.redirect('/results')
+    }
+    next()
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+const isNotBanned = async(req, res, next) => {
+  try {
+    const user=await User.findOne({username:req.body.username});
+    if(user.isBanned){
+      req.flash("danger", "You have been banned! Contact us for more information.")
+      return res.redirect('/signup')
+    }
+    next()
+  } catch (error) {
+    console.log(error)
+  }
+}
 //====================middlewares===================================
 
 //=======================MULTER=====================================
@@ -358,14 +389,12 @@ app.post("/uploadprofile", upload3.single("file"),async (req, res, next) => {
 
   //profilePicIds.push(req.file.filename);
   try{
-
   const user = await User.findById(req.user._id)
-    console.log(req.file);
+  console.log(req.file);
   file = req.file;
   if (!file) {
-    const error = new Error("Please upload a file");
-    error.httpStatusCode = 400;
-    return next(error);
+    req.flash("danger", "Please select a picture first.")
+    return res.redirect('back')
   }
 
   user.profilePic = req.file.filename;
@@ -395,7 +424,11 @@ app.get('/download/:document_id', isLoggedIn,async (req, res) => {
       res.download(__dirname +'/downloads/'+doc.fileName);
       user.points -= 20;
       user.save();
-    }, 3000); 
+    }, 3000);
+    let stat = await Stat.findOne({id:1})
+    stat.totalDownloads++
+    stat.pointsSpent+=20 
+    stat.save()
     
   } catch (error) {
     res.status(400).send('Error while downloading file. Try again later.');
@@ -480,6 +513,10 @@ app.post("/upload", isLoggedIn, async (req, res) => {
       }
       foundUser.save();
       previewPicIds=[];
+      let stat = await Stat.findOne({id:1})
+      stat.totalDocuments++
+      stat.pointsEarned+=20  
+      stat.save()
 
       //creating the notification body
       let newNotification = {
@@ -519,6 +556,9 @@ app.get("/results", async(req, res) => {
   const docs = await Document.find({})
   if(req.user) {
     const user = await User.findById(req.user._id)
+    if(user.isAdmin){
+      return res.redirect('/admin/statistics')
+    }
     res.render("results.ejs", {
       docs: docs,
       stared : user.stared
@@ -641,11 +681,26 @@ app.post('/single_material/:document_id/report',isLoggedIn, checkReportExistence
     req.flash('danger', 'Document has been reported!'); 
     res.redirect("/single_material/"+req.params.document_id);
   }else if(foundDoc.reporters.length>=5){
+    foundDoc.isReported = true
     req.flash('danger', 'Document has extended the report limit! Permanently taken down!'); 
     res.redirect("/results");
   }
     foundDoc.save();
+    let stat = await Stat.findOne({id:1})
+    stat.totalReports++ 
+    stat.save()
+});
 
+app.post('/single_material/:document_id/unreport',isLoggedIn,async(req,res)=>{
+  const foundDoc = await Document.findById(req.params.document_id);
+  foundDoc.reporters.length = 0
+  foundDoc.isReported = false
+  foundDoc.save();
+  let stat = await Stat.findOne({id:1})
+  stat.totalReports-=5
+  stat.save()
+  req.flash('success', 'Document unreported!')
+  res.redirect('back')
 });
 
 app.get("/taken-down/:document_id", (req, res) => {
@@ -674,10 +729,6 @@ app.post('/single_material/:document_id/reviews', isLoggedIn, checkReviewExisten
   }
   foundDoc.reviews.push(review);
   foundDoc.save();
-
-  
-  
-
   const user = await User.findById(req.user._id);
   user.points += 5;
 
@@ -686,8 +737,11 @@ app.post('/single_material/:document_id/reviews', isLoggedIn, checkReviewExisten
   await user.save();
   await docOwner.save();
 
-  console.log(review)
-  
+  let stat = await Stat.findOne({id:1})
+  stat.pointsEarned+=5  
+  stat.save()
+
+  console.log(review)  
   req.flash('success', 'Review submitted successfully. You earned 5 points!');
   res.redirect("/single_material/"+req.params.document_id);
 
@@ -747,7 +801,7 @@ app.get("/single_material/:document_id", async function (req, res) {
     req.flash('danger', 'Cannot find that document!');
     return res.redirect('/results');
   }
-  if(doc.reporters.length>=5){
+  if(doc.isReported){
     res.render('taken-down.ejs');
   }else{
     res.render('single_material.ejs', { doc });
@@ -774,7 +828,9 @@ app.delete('/single_material/:document_id', isLoggedIn, isUploader, async(req, r
       }
     })    
   }
-  
+  let stat = await Stat.findOne({id:1})
+  stat.totalDocuments--
+  stat.save()
   req.flash('success', 'Successfully deleted Document.')
   res.redirect('/results');
 })
@@ -821,13 +877,14 @@ app.post("/register", async (req, res) => {
       console.log(link);          
       sendverifyMail(username,link).then(result=>console.log("Email sent....",result));
       res.redirect("/signup");
-
+      let stat = await Stat.findOne({id:1})
+      stat.totalUsers++
+      stat.save()
     }
   } catch (error) {
     req.flash("danger","Email is already registered!");
     res.redirect("/signup");
   }
-
 });
 
 //Email verification route
@@ -850,7 +907,7 @@ app.get("/verify-email",async(req,res,next) => {
   }
 });
 
-app.post("/login",isVerified, (req, res, next) => {
+app.post("/login",isVerified, isNotBanned,(req, res, next) => {
   passport.authenticate("local", {
     failureRedirect: "/signup",
     successRedirect: "/results",
@@ -1009,6 +1066,41 @@ app.get('/notification/:notificationId', isLoggedIn, async(req, res) => {
     console.log(error.message)
   }  
 });
+
+// Stat.create({id:1})
+
+app.get('/admin/statistics', isAdmin,async(req,res)=>{
+  const stats = await Stat.findOne({id:1})
+  res.render('adminStats.ejs', {stats})
+})
+
+app.get('/admin/users', isAdmin,async(req,res)=>{
+  const users = await User.find({})
+  res.render('adminUsers.ejs', {users})
+})
+
+app.get('/admin/allDocuments',  isAdmin,async(req,res)=>{
+  const docs = await Document.find({})
+  res.render('adminDocs.ejs', {docs})
+})
+
+app.get('/admin/reportedDocuments', isAdmin,async(req,res)=>{
+  const docs = await Document.find({isReported:true})
+  res.render('adminreportedDocs.ejs', {docs})
+})
+
+app.post('/users/:userId/ban', isAdmin,async(req,res)=>{
+  const user = await User.findById(req.params.userId)
+  if(user.isBanned){
+    user.isBanned = false
+    req.flash('success', `${user.fullname} has been unbanned!`)
+  }else{
+    user.isBanned = true
+    req.flash('danger', `${user.fullname} has been banned!`)
+  }
+  await user.save()  
+  res.redirect('/admin/Users')
+})
 
 const port = 3000;
 

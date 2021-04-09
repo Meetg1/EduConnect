@@ -59,6 +59,10 @@ const UserSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  isBanned:{
+    type: Boolean,
+    default: false
+  },
   stared : [{
     type: mongoose.Schema.Types.ObjectId,
     ref: "Document"

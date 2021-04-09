@@ -66,13 +66,7 @@
               </div>
               <div class="content">
                 <div style="position: relative;">
-                <%if(doc.reports==5){ %>
-                  
-                  <a href="/taken-down/<%=doc._id%>" id="title_link"> <%= doc.title  %> </a>
-
-                <% } else {%>
-                  <a href="/single_material/<%=doc._id%>" id="title_link"> <%= doc.title  %> </a>
-                  <% } %>
+                  <a href="/single_material/<%=doc._id%>" id="title_link"> <%= doc.title  %> </a>                  
                   <span class="material_type"><%= doc.category  %></span>
                 </div>
                 <h5 class="pt-2"><%= doc.topic  %></h5>

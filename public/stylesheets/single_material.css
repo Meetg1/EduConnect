@@ -82,6 +82,15 @@ img {
   transition: background-color 0.6s ease;
 }
 
+.w3-row {
+  background-color: #1597bb
+}
+
+.downloadBtn {
+  background-color: #43d661;
+  color: black;
+}
+
 .active_dots,
 .dot:hover {
   background-color: #717171;
@@ -139,11 +148,11 @@ input[type="radio"] {
   height: 0;
 }
 
-input[type="radio"]:active ~ label {
+input[type="radio"]:active~label {
   opacity: 1;
 }
 
-input[type="radio"]:checked ~ label {
+input[type="radio"]:checked~label {
   opacity: 1;
 }
 
@@ -175,6 +184,7 @@ input[type="radio"]:checked ~ label {
 
 /* On smaller screens, decrease text size */
 @media only screen and (max-width: 300px) {
+
   .prev,
   .next,
   .text {
@@ -186,6 +196,7 @@ input[type="radio"]:checked ~ label {
   outline: none !important;
   box-shadow: none !important;
 }
+
 button:focus {
   border: none;
   outline: none;

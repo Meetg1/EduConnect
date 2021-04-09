@@ -45,7 +45,11 @@ const DocumentSchema = new mongoose.Schema({
   reporters:[{
     type: mongoose.Schema.Types.ObjectId,
     ref: "User"
-  }], 
+  }],
+  isReported : {
+    type: Boolean,
+    default: false
+  }, 
   driveId : String,
   mimeType : String,
   fileName : String, 
