@@ -514,7 +514,7 @@ app.post("/upload", isLoggedIn, async (req, res) => {
       foundUser.save();
       previewPicIds=[];
       let stat = await Stat.findOne({id:1})
-      stat.totalDocuments++
+      stat.totalDocuments++;
       stat.pointsEarned+=20  
       stat.save()
 
@@ -551,9 +551,23 @@ app.post("/upload", isLoggedIn, async (req, res) => {
   }
 });
 
-app.get("/results", async(req, res) => {
+app.get("/results/:page", async(req, res) => {
 
-  const docs = await Document.find({})
+  var limit = 5;
+  var page = req.params.page
+  console.log(page);
+  var skip = (page - 1)* limit;
+  console.log(skip)
+  var docs = await Document.find({})
+  var number_of_pages = Math.ceil(docs.length / limit)
+  console.log("xyz: "+number_of_pages);
+  // if(docs.length % limit !=0 ){
+  //   number_of_pages = number_of_pages + 1;
+  // }
+  console.log("pages: "+number_of_pages);
+
+  docs = await Document.find({}).skip(skip).limit(limit);
+
   if(req.user) {
     const user = await User.findById(req.user._id)
     if(user.isAdmin){
@@ -561,11 +575,13 @@ app.get("/results", async(req, res) => {
     }
     res.render("results.ejs", {
       docs: docs,
-      stared : user.stared
+      stared : user.stared,
+      number_of_pages: number_of_pages
     });
   }else {
-    res.render("results.ejs", {
+    res.render("results.ejs" , {
       docs: docs,
+      number_of_pages: number_of_pages
     });
   }
   
@@ -576,6 +592,7 @@ app.post("/search", function(req, res){
   var keyword = req.body.keyword;
   //console.log(keyword);
   //keyword = search.toLowerCase();
+  
 
   Document.find({$or:[{"university":{ $regex : new RegExp(keyword, "i") }},
                       {"course": { $regex : new RegExp(keyword, "i") }},
@@ -910,7 +927,7 @@ app.get("/verify-email",async(req,res,next) => {
 app.post("/login",isVerified, isNotBanned,(req, res, next) => {
   passport.authenticate("local", {
     failureRedirect: "/signup",
-    successRedirect: "/results",
+    successRedirect: "/results/1",
     failureFlash: true,
     successFlash: "Welcome to EduConnect " + req.body.username + "!",
   })(req, res, next);
