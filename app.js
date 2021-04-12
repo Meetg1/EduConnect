@@ -553,7 +553,7 @@ app.post("/upload", isLoggedIn, async (req, res) => {
 
 app.get("/results/:page", async(req, res) => {
 
-  var limit = 5;
+  var limit = 2;
   var page = req.params.page
   console.log(page);
   var skip = (page - 1)* limit;
@@ -576,12 +576,14 @@ app.get("/results/:page", async(req, res) => {
     res.render("results.ejs", {
       docs: docs,
       stared : user.stared,
-      number_of_pages: number_of_pages
+      number_of_pages: number_of_pages,
+      current_page: page
     });
   }else {
     res.render("results.ejs" , {
       docs: docs,
-      number_of_pages: number_of_pages
+      number_of_pages: number_of_pages,
+      current_page: page
     });
   }
   
