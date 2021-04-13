@@ -1086,7 +1086,8 @@ app.get('/notification/:notificationId', isLoggedIn, async(req, res) => {
   }  
 });
 
-// Stat.create({id:1})
+ //Stat.create({id:1})
+
 
 app.get('/admin/statistics', isAdmin,async(req,res)=>{
   const stats = await Stat.findOne({id:1})
