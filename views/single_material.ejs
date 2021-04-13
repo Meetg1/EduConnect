@@ -20,23 +20,12 @@
 
   <div class="slideshow-container">
 
-    <div class="mySlides  ">
-      <div class="numbertext">1 / 3</div>
-      <img src="../previewPics/<%=doc.previewPics[0]%>">
-      
-    </div>
-
-    <div class="mySlides ">
-      <div class="numbertext">2 / 3</div>
-      <img src="../previewPics/<%=doc.previewPics[1]%>">
-      
-    </div>
-
-    <div class="mySlides ">
-      <div class="numbertext">3 / 3</div>
-      <img src="../previewPics/<%=doc.previewPics[2]%>">
-      
-    </div>
+    <% for( let i = 0; i < doc.previewPics.length; i++ ) { %>
+      <div class="mySlides  ">
+        <div class="numbertext"><%=i+1%> / <%=doc.previewPics.length%></div>
+        <img src="../previewPics/<%=doc.previewPics[i]%>">      
+      </div>
+    <% } %>
 
     <a class="prev" onclick="plusSlides(-1)">&#10094;</a>
     <a class="next" onclick="plusSlides(1)">&#10095;</a>
