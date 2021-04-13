@@ -558,15 +558,15 @@ app.get("/results/:page", async(req, res) => {
   console.log(page);
   var skip = (page - 1)* limit;
   console.log(skip)
-  var docs = await Document.find({})
-  var number_of_pages = Math.ceil(docs.length / limit)
-  console.log("xyz: "+number_of_pages);
+  var num_of_docs = await Document.countDocuments()
+  var number_of_pages = Math.ceil(num_of_docs / limit)
+  console.log("xyz: "+num_of_docs);
   // if(docs.length % limit !=0 ){
   //   number_of_pages = number_of_pages + 1;
   // }
   console.log("pages: "+number_of_pages);
 
-  docs = await Document.find({}).skip(skip).limit(limit);
+  docs = await Document.find().sort({ upvotes: -1 }).skip(skip).limit(limit);
 
   if(req.user) {
     const user = await User.findById(req.user._id)
