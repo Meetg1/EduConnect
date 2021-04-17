@@ -211,7 +211,7 @@ const checkReviewExistence = (req, res, next) => {
   Document.findById(req.params.document_id).populate('reviews').exec(function(err, foundDoc){
     if(!foundDoc || err) {
       console.log(err)
-      return res.redirect('/results')
+      return res.redirect('/results/1')
     }
     const foundReview = foundDoc.reviews.some(function(review) {
       return review.author.equals(req.user._id)
@@ -236,7 +236,7 @@ const checkReportExistence = async(req, res, next) => {
   try {
     const foundDoc = await Document.findById(req.params.document_id)
     if(!foundDoc) {    
-      return res.redirect('/results')
+      return res.redirect('/results/1')
     }
     const foundReport = foundDoc.reporters.some(function(reporter) {
       return reporter.equals(req.user._id)
@@ -259,7 +259,7 @@ const isUploader = async(req, res, next) => {
   const doc = await Document.findById(req.params.document_id);
   if(!doc.uploader.id.equals(req.user._id)){
     req.flash('danger', 'You do not have permission to do that!');
-    return res.redirect('/results');
+    return res.redirect('/results/1');
   }
   next();
 }
@@ -292,7 +292,7 @@ const isAdmin = async(req, res, next) => {
     const user = await User.findById(req.user._id)
     if(!user.isAdmin){
       req.flash("danger", "You are not an admin!")
-      return res.redirect('/results')
+      return res.redirect('back')
     }
     next()
   } catch (error) {
@@ -658,11 +658,11 @@ app.post("/results/:document_id/addstar",  isLoggedIn, async(req, res) => {
      user.stared.push(foundDoc);
      user.save();
      req.flash('success', 'Document added to starred documents.')
-     return res.redirect("/results");
+     return res.redirect("back");
 
   } catch(error){
       console.error(error);
-      return redirect("/results")
+      return redirect("/results/1")
   }
 });
 
@@ -686,11 +686,11 @@ app.post("/results/:document_id/removestar",  isLoggedIn, async(req, res) => {
      return res.redirect("back");
   } catch(error){
       console.error(error);
-      return redirect("/results")
+      return redirect("/results/1")
   }
 });
 
-app.post('/single_material/:document_id/report',isLoggedIn, checkReportExistence ,async(req,res)=>{
+app.post('/single_material/:document_id/report',isLoggedIn ,async(req,res)=>{
 
   const foundDoc = await Document.findById(req.params.document_id);
   const user = await User.findById(req.user._id);
@@ -702,12 +702,15 @@ app.post('/single_material/:document_id/report',isLoggedIn, checkReportExistence
   }else if(foundDoc.reporters.length>=5){
     foundDoc.isReported = true
     req.flash('danger', 'Document has extended the report limit! Permanently taken down!'); 
-    res.redirect("/results");
+    res.redirect("back");
   }
     foundDoc.save();
     let stat = await Stat.findOne({id:1})
     stat.totalReports++ 
     stat.save()
+
+  const uploader = await User.findById(foundDoc.uploader.id)
+  uploader.reports++
 });
 
 app.post('/single_material/:document_id/unreport',isLoggedIn,async(req,res)=>{
@@ -778,7 +781,7 @@ app.get("/users/:user_id", async (req, res) => {
 
     if (!foundUser) {
       req.flash("danger", "No such user found");
-      return res.redirect("/results");
+      return res.redirect("back");
     } else {
       Document.find().where('uploader.id').equals(foundUser.id).exec(function (err, docs) {
         if (err) {
@@ -815,18 +818,22 @@ app.get("/single_material/:document_id", async function (req, res) {
     }
   }).populate('author');
 
-
   if (!doc) {
     req.flash('danger', 'Cannot find that document!');
-    return res.redirect('/results');
+    return res.redirect('back');
   }
-  if(doc.isReported){
-    res.render('taken-down.ejs');
-  }else{
-    res.render('single_material.ejs', { doc });
-  }
-  
 
+  if(req.user){
+    const user = await User.findById(req.user._id);
+    console.log(user.isAdmin)
+    if(!user.isAdmin && doc.isReported){
+      res.render('taken-down.ejs');
+    }else{
+      res.render('single_material.ejs', { doc });
+    }
+  }else{
+    doc.isReported ? res.render('taken-down.ejs') : res.render('single_material.ejs', { doc });
+  }
 });
 
 app.delete('/single_material/:document_id', isLoggedIn, isUploader, async(req, res) => {
@@ -851,7 +858,7 @@ app.delete('/single_material/:document_id', isLoggedIn, isUploader, async(req, r
   stat.totalDocuments--
   stat.save()
   req.flash('success', 'Successfully deleted Document.')
-  res.redirect('/results');
+  res.redirect('back');
 })
 
 app.post("/register", async (req, res) => {
@@ -1030,7 +1037,7 @@ app.get('/users/:userId/follow', isLoggedIn, async(req,res) => {
   console.log(user)
   if(!user){
     req.flash('danger', 'User not found!')
-    return res.redirect('/results')
+    return res.redirect('back')
   }  
   user.followers.push(req.user._id)
   user.followerCount++
@@ -1046,7 +1053,7 @@ app.get('/users/:userId/unfollow', isLoggedIn, async(req,res) => {
   console.log(user)
   if(!user){
     req.flash('danger', 'User not found!')
-    return res.redirect('/results')
+    return res.redirect('back')
   }  
   let i = 0;
      while(i < user.followers.length){

@@ -66,7 +66,11 @@ const UserSchema = new mongoose.Schema({
   stared : [{
     type: mongoose.Schema.Types.ObjectId,
     ref: "Document"
-  }]
+  }],
+  reports : {
+    type: Number,
+    default: 0
+  }
 });
 
 UserSchema.plugin(passportLocalMongoose);
