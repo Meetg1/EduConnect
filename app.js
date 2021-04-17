@@ -690,7 +690,7 @@ app.post("/results/:document_id/removestar",  isLoggedIn, async(req, res) => {
   }
 });
 
-app.post('/single_material/:document_id/report',isLoggedIn ,async(req,res)=>{
+app.post('/single_material/:document_id/report',isLoggedIn ,checkReportExistence, async(req,res)=>{
 
   const foundDoc = await Document.findById(req.params.document_id);
   const user = await User.findById(req.user._id);
@@ -711,6 +711,7 @@ app.post('/single_material/:document_id/report',isLoggedIn ,async(req,res)=>{
 
   const uploader = await User.findById(foundDoc.uploader.id)
   uploader.reports++
+  uploader.save()
 });
 
 app.post('/single_material/:document_id/unreport',isLoggedIn,async(req,res)=>{
