@@ -553,18 +553,20 @@ app.post("/upload", isLoggedIn, async (req, res) => {
 
 app.get("/results/:page", async(req, res) => {
 
-  var limit = 2;
+
+
+  var limit = 1;
   var page = req.params.page
-  console.log(page);
+  
   var skip = (page - 1)* limit;
-  console.log(skip)
+ 
   var num_of_docs = await Document.countDocuments()
   var number_of_pages = Math.ceil(num_of_docs / limit)
-  console.log("xyz: "+num_of_docs);
-  // if(docs.length % limit !=0 ){
-  //   number_of_pages = number_of_pages + 1;
-  // }
-  console.log("pages: "+number_of_pages);
+  
+  //  if(docs.length % limit !=0 ){
+  //    number_of_pages = number_of_pages + 1;
+  //  }
+  // console.log("pages: "+number_of_pages);
 
   docs = await Document.find().sort({ upvotes: -1 }).skip(skip).limit(limit);
 
@@ -577,67 +579,222 @@ app.get("/results/:page", async(req, res) => {
       docs: docs,
       stared : user.stared,
       number_of_pages: number_of_pages,
-      current_page: page
+      current_page: page,
+      redirect: "results"
     });
   }else {
     res.render("results.ejs" , {
       docs: docs,
       number_of_pages: number_of_pages,
-      current_page: page
+      current_page: page,
+      redirect: "results"
+    });
+  }
+  
+});
+var keyword="";
+app.post("/search/:page", async(req, res) => {
+
+  keyword = req.body.keyword;
+  console.log("keyword: "+keyword);
+  
+  var limit = 1;
+  var page = req.params.page
+  console.log("page:"+page);
+  var skip = (page - 1)* limit;
+  console.log("skip: "+skip)
+
+  docs = await  Document.find({$or:[{"university":{ $regex : new RegExp(keyword, "i") }},
+                      {"course": { $regex : new RegExp(keyword, "i") }},
+                      {"title": { $regex : new RegExp(keyword, "i") }},
+                      {"topic": { $regex : new RegExp(keyword, "i") }}
+                      ]});
+  console.log("docs: "+docs);
+
+  var num_of_docs = docs.length;
+  var number_of_pages = Math.ceil(num_of_docs / limit)
+  console.log("xyz: "+num_of_docs+" "+number_of_pages);
+  
+
+  docs =  docs.slice(skip,(skip+limit));
+  console.log(docs);
+
+  if(req.user) {
+    const user = await User.findById(req.user._id)
+    if(user.isAdmin){
+      return res.redirect('/admin/statistics')
+    }
+    res.render("results.ejs", {
+      docs: docs,
+      stared : user.stared,
+      number_of_pages: number_of_pages,
+      current_page: page,
+      redirect: "search"
+    });
+  }else {
+    res.render("results.ejs" , {
+      docs: docs,
+      number_of_pages: number_of_pages,
+      current_page: page,
+      redirect: "search"
+    });
+  }  
+});
+
+app.get("/search/:page", async(req, res) => {
+
+ 
+  console.log("keyword: "+keyword);
+  
+  var limit = 1;
+  var page = req.params.page
+  console.log("page:"+page);
+  var skip = (page - 1)* limit;
+  console.log("skip: "+skip)
+
+  docs = await  Document.find({$or:[{"university":{ $regex : new RegExp(keyword, "i") }},
+                      {"course": { $regex : new RegExp(keyword, "i") }},
+                      {"title": { $regex : new RegExp(keyword, "i") }},
+                      {"topic": { $regex : new RegExp(keyword, "i") }}
+                      ]});
+  console.log("docs: "+docs);
+
+  var num_of_docs = docs.length;
+  var number_of_pages = Math.ceil(num_of_docs / limit)
+  console.log("xyz: "+num_of_docs+" "+number_of_pages);
+  
+
+  docs =  docs.slice(skip,(skip+limit));
+  console.log(docs);
+
+  if(req.user) {
+    const user = await User.findById(req.user._id)
+    if(user.isAdmin){
+      return res.redirect('/admin/statistics')
+    }
+    res.render("results.ejs", {
+      docs: docs,
+      stared : user.stared,
+      number_of_pages: number_of_pages,
+      current_page: page,
+      redirect: "search"
+    });
+  }else {
+    res.render("results.ejs" , {
+      docs: docs,
+      number_of_pages: number_of_pages,
+      current_page: page,
+      redirect: "search"
+    });
+  }  
+});
+
+var university = "";
+var course = "";    
+var year = "";    
+var category = "";
+app.post("/filter/:page", async(req, res) => {
+
+  university = req.body.university;
+  course = req.body.course;    
+  year = req.body.year    
+  category = req.body.category;
+  console.log(university, course, year, category);
+
+  var limit = 1;
+  var page = req.params.page
+  console.log("page:"+page);
+  var skip = (page - 1)* limit;
+  console.log("skip: "+skip)
+
+  docs = await  Document.find({"university":{ $regex : new RegExp(university, "i") },
+                      "course": { $regex : new RegExp(course, "i") },
+                      "year": { $regex : new RegExp(year, "i") },
+                      "category": { $regex : new RegExp(category, "i") }
+                      });
+  console.log("docs: "+docs);
+
+  var num_of_docs = docs.length;
+  var number_of_pages = Math.ceil(num_of_docs / limit)
+  console.log("xyz: "+num_of_docs+" "+number_of_pages);
+  
+
+  docs =  docs.slice(skip,(skip+limit));
+  console.log(docs);
+
+  if(req.user) {
+    const user = await User.findById(req.user._id)
+    if(user.isAdmin){
+      return res.redirect('/admin/statistics')
+    }
+    res.render("results.ejs", {
+      docs: docs,
+      stared : user.stared,
+      number_of_pages: number_of_pages,
+      current_page: page,
+      redirect: "filter"
+    });
+  }else {
+    res.render("results.ejs" , {
+      docs: docs,
+      number_of_pages: number_of_pages,
+      current_page: page,
+      redirect: "filter"
+    });
+  }
+  
+});
+
+app.get("/filter/:page", async(req, res) => {
+
+  console.log(university, course, year, category);
+
+  var limit = 1;
+  var page = req.params.page
+  console.log("page:"+page);
+  var skip = (page - 1)* limit;
+  console.log("skip: "+skip)
+
+  docs = await  Document.find({"university":{ $regex : new RegExp(university, "i") },
+                      "course": { $regex : new RegExp(course, "i") },
+                      "year": { $regex : new RegExp(year, "i") },
+                      "category": { $regex : new RegExp(category, "i") }
+                      });
+  console.log("docs: "+docs);
+
+  var num_of_docs = docs.length;
+  var number_of_pages = Math.ceil(num_of_docs / limit)
+  console.log("xyz: "+num_of_docs+" "+number_of_pages);
+  
+
+  docs =  docs.slice(skip,(skip+limit));
+  console.log(docs);
+
+  if(req.user) {
+    const user = await User.findById(req.user._id)
+    if(user.isAdmin){
+      return res.redirect('/admin/statistics')
+    }
+    res.render("results.ejs", {
+      docs: docs,
+      stared : user.stared,
+      number_of_pages: number_of_pages,
+      current_page: page,
+      redirect: "filter"
+    });
+  }else {
+    res.render("results.ejs" , {
+      docs: docs,
+      number_of_pages: number_of_pages,
+      current_page: page,
+      redirect: "filter"
     });
   }
   
 });
 
 
-app.post("/search", function(req, res){
-  var keyword = req.body.keyword;
-  //console.log(keyword);
-  //keyword = search.toLowerCase();
-  
 
-  Document.find({$or:[{"university":{ $regex : new RegExp(keyword, "i") }},
-                      {"course": { $regex : new RegExp(keyword, "i") }},
-                      {"title": { $regex : new RegExp(keyword, "i") }},
-                      {"topic": { $regex : new RegExp(keyword, "i") }}
-                      ]},
-                      function (err, docs) {
-    if (err) {
-      console.log(err);
-    } else {
-      res.render("results.ejs", {
-        docs: docs
-
-      });
-    }
-  });
-});
-
-app.post("/filter", function(req, res){
-    var university = req.body.university;
-    var course = req.body.course;    
-    var year = req.body.year    
-    var category = req.body.category;
-    console.log(university, course, year, category);
-
- Document.find({"university":{ $regex : new RegExp(university, "i") },
-                      "course": { $regex : new RegExp(course, "i") },
-                      "year": { $regex : new RegExp(year, "i") },
-                      "category": { $regex : new RegExp(category, "i") }
-                      },
-                      function (err, docs) {
-    if (err) {
-      console.log(err);
-    } else {
-      req.flash("success","Filter has been added. ");
-      res.render("results.ejs", {
-        docs: docs
-
-      });
-    }
-  });
-
-});
 
 app.get("/users/:user_id/stared", isLoggedIn, async(req, res)=>{
     try{

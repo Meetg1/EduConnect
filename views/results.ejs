@@ -16,7 +16,7 @@
 
        <section class="filter_section mt-5">
         
-        <form action="/filter" method="POST">
+        <form action="/filter/1" method="POST">
           <div class="row">
             <div class="filterBox col-lg-3 mb-3">
               <label class="d-block"  for="university">University filter</label>
@@ -136,9 +136,9 @@
         <div style="text-align: center;">
           <% for (var i =1; i <= number_of_pages  ;  i++ ) { %>
             <% if (i == current_page) { %>
-              <a href="../results/<%= i %>" style="border-style: solid; padding: 10px; text-decoration: none;"><%=i %></a> &nbsp;
+              <a href="../<%= redirect %>/<%= i %>" style="border-style: solid; padding: 10px; text-decoration: none;"><%=i %></a> &nbsp;
             <%}else{%>
-              <a href="../results/<%= i %>" style="border: solid gray; padding: 10px; text-decoration: none; color: gray;"><%=i %></a> &nbsp;              
+              <a href="../<%= redirect %>/<%= i %>" style="border: solid gray; padding: 10px; text-decoration: none; color: gray;"><%=i %></a> &nbsp;              
             <%}%>
         <% } %>
         </div>
