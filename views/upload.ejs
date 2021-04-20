@@ -22,14 +22,7 @@
 <body>
 
     <%- include('partials/navbar')%>
-
-    <% if(typeof(errors) !="undefined") { %>
-      
-      <% errors.forEach((error) => { %>
-         <div class ="alert alert-danger"><%= error.msg  %></div>
-      <%})%>
-       
-   <%}%>
+    <%- messages('messages', locals) %>
 
 
     <div class="container">
@@ -52,16 +45,16 @@
                                 <p class="mt-4">Step 1: Choose a course for which you'd like to upload documents</p>
                                 <form id="form1">
                                     <div class="form-group row">
-                                        <label for="uni" class="col-form-label" id="uni">University:</label>
+                                        <label for="uni" class="col-form-label" id="uni">University<span class="text-danger">*</span> :</label>
                                         <div class="col-sm-10">
                                             <input type="text" placeholder="Select university" class="form-control" name="university">
                                         </div>
                                     </div>
                                     <div class="form-group row">
-                                        <label for="course" class="col-form-label" id="course">Course:</label>
+                                        <label for="course" class="col-form-label" id="course">Course<span class="text-danger">*</span>:</label>
                                         <div class="col-sm-10">
                                             <select class="custom-select form-control" name="course">
-                                                <option selected>Select a course/degree</option>
+                                                <option selected value="">Select a course/degree</option>
                                                 <% for( let i = 0; i < courses.length; i++ ) { %>
                                                     <option value="<%=courses[i]%>"><%=courses[i]%></option>
                                                 <% } %>
@@ -84,13 +77,13 @@
                             <p class="mt-4">Step 2: Please enter the following details: </p>
                             <form id="form2">
                                 <div class="form-group row">
-                                    <label for="uni" class="col-form-label" id="uni">Title:</label>
+                                    <label for="uni" class="col-form-label" id="uni">Title<span class="text-danger">*</span>:</label>
                                     <div class="col-sm-10">
                                         <input type="text" placeholder="Select title" class="form-control" name="title">
                                     </div>
                                 </div>
                                 <div class="form-group row">
-                                    <label for="course" class="col-form-label" id="course">Category:</label>
+                                    <label for="course" class="col-form-label" id="course">Category<span class="text-danger">*</span>:</label>
                                     <div class="col-sm-10 col-lg-5">
                                         <select class="custom-select form-control" name="category">
                                             <option selected value="">Select a category</option>
@@ -99,30 +92,30 @@
                                             <option value="Assignment">Assignment</option>
                                         </select>
                                     </div>
-                                    <label for="uni" class="col-form-label" id="uni">Date:</label>
+                                    <label for="uni" class="col-form-label" style="width: 135px;" id="uni">Date<span class="text-danger">*</span>:</label>
                                     <div class="col-sm-10 col-lg-3">
                                         <input type="date" placeholder="Select" class="form-control" name="date">
                                     </div>
                                 </div>
                                 <div class="form-group row">
-                                    <label for="uni" class="col-form-label" id="uni">Topic:</label>
+                                    <label for="uni" class="col-form-label" id="uni">Topic<span class="text-danger">*</span>:</label>
                                     <div class="col-sm-10 col-lg-5">
                                         <input type="text" placeholder="Select" class="form-control" name="topic">
                                     </div>
-                                    <label for="uni" class="col-form-label" id="uni">Number of pages:</label>
+                                    <label for="uni" class="col-form-label" style="width: 135px;" id="uni">Number of pages<span class="text-danger">*</span>:</label>
                                     <div class="col-sm-10 col-lg-3">
                                         <input type="text" placeholder="Select" class="form-control" name="num_pages">
                                     </div>
                                 </div>
                                 <div class="form-group row">
-                                    <label for="uni" class="col-form-label" id="uni">Description:</label>
+                                    <label for="uni" class="col-form-label" id="uni">Description<span class="text-danger">*</span>:</label>
                                     <div class="col-sm-10 text-left">
                                         <textarea name="description" id="" cols="0" rows="5"></textarea>
                                     </div>
                                 </div>
                                 
                                 <div class="form-group row">
-                                   <label>Preview Pictures: </label> &nbsp;&nbsp;Please upload 3 preview images, including index if possible                         
+                                   <label>Preview Pictures<span class="text-danger">*</span>: </label> &nbsp;&nbsp;Please upload 2-4 preview images, including index if possible.                         
                                 </div>
                             </form>
                             <div class="step">                                

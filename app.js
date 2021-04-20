@@ -365,7 +365,6 @@ app.post("/uploadfile", upload1.single("file"), (req, res, next) => {
     error.httpStatusCode = 400;
     return next(error);
   }
-
   res.send(file);
 });
 
@@ -442,10 +441,6 @@ app.get('/download/:document_id', isLoggedIn,async (req, res) => {
 app.post("/upload", isLoggedIn, async (req, res) => {
   // console.log(req.body);
   try {
-    const uploadedFile = await uploadToDrive(file.originalname, file.mimetype);
-    // if (uploadedFile) {
-    //   console.log(uploadedFile);
-    // }
     
     const {
       university,
@@ -468,12 +463,15 @@ app.post("/upload", isLoggedIn, async (req, res) => {
      req.checkBody("description", "description is required").notEmpty();
 
      let errors = req.validationErrors();
-    if (errors) {
-      console.log(errors);
-      res.render("upload.ejs", {
-        errors
-      });
-    } else{
+      if (errors) {
+        console.log("sgdagsgfds"+errors)
+        return res.redirect('back')
+      }
+      if (previewPicIds.length==0) {
+        return res.redirect('back')
+      }
+
+      const uploadedFile = await uploadToDrive(file.originalname, file.mimetype);
 
       const driveId = uploadedFile.data.id;
       const uploader = {
@@ -541,21 +539,17 @@ app.post("/upload", isLoggedIn, async (req, res) => {
           console.log("Successfully deleted the file : " + pathToFile)
         }
       })
-    }
 
-    
-
-
+      file = undefined
   } catch (error) {
+    res.redirect('results/1')
     console.log(error);
   }
 });
 
 app.get("/results/:page", async(req, res) => {
 
-
-
-  var limit = 1;
+  var limit = 3;
   var page = req.params.page
   
   var skip = (page - 1)* limit;
@@ -598,7 +592,7 @@ app.post("/search/:page", async(req, res) => {
   keyword = req.body.keyword;
   console.log("keyword: "+keyword);
   
-  var limit = 1;
+  var limit = 3;
   var page = req.params.page
   console.log("page:"+page);
   var skip = (page - 1)* limit;
@@ -646,7 +640,7 @@ app.get("/search/:page", async(req, res) => {
  
   console.log("keyword: "+keyword);
   
-  var limit = 1;
+  var limit = 3;
   var page = req.params.page
   console.log("page:"+page);
   var skip = (page - 1)* limit;
@@ -701,7 +695,7 @@ app.post("/filter/:page", async(req, res) => {
   category = req.body.category;
   console.log(university, course, year, category);
 
-  var limit = 1;
+  var limit = 3;
   var page = req.params.page
   console.log("page:"+page);
   var skip = (page - 1)* limit;
@@ -749,7 +743,7 @@ app.get("/filter/:page", async(req, res) => {
 
   console.log(university, course, year, category);
 
-  var limit = 1;
+  var limit = 3;
   var page = req.params.page
   console.log("page:"+page);
   var skip = (page - 1)* limit;
@@ -1016,7 +1010,7 @@ app.delete('/single_material/:document_id', isLoggedIn, isUploader, async(req, r
   stat.totalDocuments--
   stat.save()
   req.flash('success', 'Successfully deleted Document.')
-  res.redirect('back');
+  res.redirect('/results/1');
 })
 
 app.post("/register", async (req, res) => {
@@ -1285,6 +1279,11 @@ app.post('/users/:userId/ban', isAdmin,async(req,res)=>{
   }
   await user.save()  
   res.redirect('/admin/Users')
+})
+
+app.get('/undefined',(req,res)=>{
+  req.flash('danger','Please enter all fields.')
+  res.redirect('/upload')
 })
 
 const port = 3000;
