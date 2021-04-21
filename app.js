@@ -30,21 +30,23 @@ const fs = require("fs");
 const crypto=require("crypto");
 
 //====================DATABASE CONNECTION==========================
-const dbUrl = "mongodb://localhost:27017/test";
+const db = process.env.MY_MONGODB_URI;
 
-mongoose.connect(dbUrl, {
-  useNewUrlParser: true,
-  useCreateIndex: true,
-  useUnifiedTopology: true,
-});
-
-const db = mongoose.connection;
-db.on("error", console.error.bind(console, "database connection error:"));
-db.once("open", () => {
-  console.log("Database connected!!");
-});
-
-
+const connectDB = async () => {
+  try {
+    await mongoose.connect(db, {
+      useUnifiedTopology: true,
+      useNewUrlParser: true,
+      useFindAndModify: false,
+    });
+    console.log("DATABASE CONNECTED");
+  } catch (err) {
+    console.error(err.message);
+    process.exit(1);
+  }
+};
+// CONNECT DATABASE
+connectDB();
 
 
 app.use(express.json());
