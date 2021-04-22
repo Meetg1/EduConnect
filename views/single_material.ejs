@@ -27,17 +27,30 @@
       </div>
     <% } %>
 
-    <a class="prev" onclick="plusSlides(-1)">&#10094;</a>
+<% if(doc.previewPics.length >= 2) { %>
+
+  <a class="prev" onclick="plusSlides(-1)">&#10094;</a>
     <a class="next" onclick="plusSlides(1)">&#10095;</a>
+      
+    <% } %>
+    
 
   </div>
   <br>
+<% if(doc.previewPics.length >= 2) { %>
 
-  <div style="text-align:center">
-    <span class="dot" onclick="currentSlide(1)"></span>
-    <span class="dot" onclick="currentSlide(2)"></span>
-    <span class="dot" onclick="currentSlide(3)"></span>
+ <div style="text-align:center">
+   <% for( let i = 0; i < doc.previewPics.length; i++ ) { %>
+
+    <span class="dot" onclick="currentSlide(<%=i+1%>)"></span>
+      
+      
+    <% } %>
+    
   </div>
+      
+    <% } %>
+  
 
   <br>
  <form action="/single_material/<%=doc._id%>/report" method="POST">
