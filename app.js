@@ -38,6 +38,7 @@ const connectDB = async () => {
       useUnifiedTopology: true,
       useNewUrlParser: true,
       useFindAndModify: false,
+      useCreateIndex: true,
     });
     console.log("DATABASE CONNECTED");
   } catch (err) {
@@ -979,7 +980,6 @@ app.get("/single_material/:document_id", async function (req, res) {
 
   if(req.user){
     const user = await User.findById(req.user._id);
-    console.log(user.isAdmin)
     if(!user.isAdmin && doc.isReported){
       res.render('taken-down.ejs');
     }else{
@@ -1028,7 +1028,7 @@ app.post("/register", async (req, res) => {
     req.checkBody("fullname", "Name is required").notEmpty();
     req.checkBody("university", "University is required").notEmpty();
     req.checkBody("username", "Enter a valid Email-id").isEmail();
-    req.checkBody("password", "Password is required").notEmpty();
+    req.checkBody("password", "password must be of minimum 6 characters").isLength({ min: 6 })
     req.checkBody("cpwd", "Passwords do not match").equals(req.body.password);
 
     let errors = req.validationErrors();
