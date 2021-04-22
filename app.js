@@ -260,7 +260,8 @@ const isUploader = async(req, res, next) => {
     return res.redirect("/signup");
   }
   const doc = await Document.findById(req.params.document_id);
-  if(!doc.uploader.id.equals(req.user._id)){
+  const user = await User.findById(req.user._id)
+  if(!user.isAdmin && !doc.uploader.id.equals(req.user._id)){
     req.flash('danger', 'You do not have permission to do that!');
     return res.redirect('/results/1');
   }
@@ -1095,6 +1096,11 @@ app.post("/login",isVerified, isNotBanned,(req, res, next) => {
     successFlash: "Welcome to EduConnect " + req.body.username + "!",
   })(req, res, next);
 });
+
+// User.findById("608021176699a418a81b2eb2", function(err, user) {
+//   user.isAdmin = true
+//   user.save()
+// })
 
 //Logout
 app.get("/logout", (req, res) => {
