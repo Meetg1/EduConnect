@@ -1104,10 +1104,10 @@ app.post("/login",isVerified, isNotBanned,(req, res, next) => {
   })(req, res, next);
 });
 
-// User.findById("608021176699a418a81b2eb2", function(err, user) {
-//   user.isAdmin = true
-//   user.save()
-// })
+ //User.findById("608793f03d84d7159425ef6e", function(err, user) {
+   //user.isAdmin = true
+   //user.save()
+ //})
 
 //Logout
 app.get("/logout", (req, res) => {
