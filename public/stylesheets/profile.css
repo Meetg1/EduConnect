@@ -21,6 +21,10 @@ html {
   padding-bottom: 20px;
 }
 
+.mgn {
+  margin-top: -15px;
+}
+
 .clr {
   padding-bottom: 10px;
 }

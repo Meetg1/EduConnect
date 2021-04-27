@@ -184,7 +184,7 @@
           </div>
           <% if(currentUser && doc.uploader.id.equals(currentUser._id) || currentUser && currentUser.isAdmin){ %>
           <form action='/single_material/<%=doc._id%>?_method=DELETE' method="POST">
-            <button class="btn btn-xs btn-danger mt-3">Delete</button>
+            <button class="btn btn-xs btn-danger mgn">Delete</button>
           </form>
           <% } %>
         </div>
