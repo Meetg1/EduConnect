@@ -653,11 +653,8 @@ app.get("/search/:page", async(req, res) => {
 
   var num_of_docs = docs.length;
   var number_of_pages = Math.ceil(num_of_docs / limit)
-  console.log("xyz: "+num_of_docs+" "+number_of_pages);
-  
-
+ 
   docs =  docs.slice(skip,(skip+limit));
-  console.log(docs);
 
   if(req.user) {
     const user = await User.findById(req.user._id)
@@ -704,15 +701,11 @@ app.post("/filter/:page", async(req, res) => {
                       "year": { $regex : new RegExp(year, "i") },
                       "category": { $regex : new RegExp(category, "i") }
                       });
-  console.log("docs: "+docs);
 
   var num_of_docs = docs.length;
   var number_of_pages = Math.ceil(num_of_docs / limit)
-  console.log("xyz: "+num_of_docs+" "+number_of_pages);
-  
 
   docs =  docs.slice(skip,(skip+limit));
-  console.log(docs);
 
   if(req.user) {
     const user = await User.findById(req.user._id)
@@ -743,24 +736,18 @@ app.get("/filter/:page", async(req, res) => {
 
   var limit = 3;
   var page = req.params.page
-  console.log("page:"+page);
   var skip = (page - 1)* limit;
-  console.log("skip: "+skip)
 
   docs = await  Document.find({"university":{ $regex : new RegExp(university, "i") },
                       "course": { $regex : new RegExp(course, "i") },
                       "year": { $regex : new RegExp(year, "i") },
                       "category": { $regex : new RegExp(category, "i") }
                       });
-  console.log("docs: "+docs);
-
+ 
   var num_of_docs = docs.length;
   var number_of_pages = Math.ceil(num_of_docs / limit)
-  console.log("xyz: "+num_of_docs+" "+number_of_pages);
-  
 
   docs =  docs.slice(skip,(skip+limit));
-  console.log(docs);
 
   if(req.user) {
     const user = await User.findById(req.user._id)
@@ -1006,9 +993,15 @@ app.delete('/single_material/:document_id', isLoggedIn, isUploader, async(req, r
 
   let user = await User.findById(doc.uploader.id)
   user.uploads--;
-  if(doc.category=="notes_uploads") user.notes_uploads--
-  else if(doc.category=="assignments_uploads") user.assignments_uploads--
-  else user.papers_uploads--
+  if(doc.category=="Lecture Notes") {
+    user.notes_uploads--
+  }
+  else if(doc.category=="Assignment") {
+    user.assignments_uploads--
+  }
+  else if(doc.category=="Question Paper") {
+    user.papers_uploads--
+  }
   user.save()
  
   let stat = await Stat.findOne({id:1})
