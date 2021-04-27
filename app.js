@@ -560,11 +560,6 @@ app.get("/results/:page", async(req, res) => {
  
   var num_of_docs = await Document.countDocuments()
   var number_of_pages = Math.ceil(num_of_docs / limit)
-  console.log(skip);
-  console.log(page);
-  console.log(number_of_pages);
-  console.log(num_of_docs);
-
   
   //  if(docs.length % limit !=0 ){
   //    number_of_pages = number_of_pages + 1;
@@ -573,7 +568,7 @@ app.get("/results/:page", async(req, res) => {
 
   docs = await Document.find().sort({ upvotes: -1 });
   docs = docs.slice(skip,(skip+limit));
-  console.log(docs);
+
 
   if(req.user) {
     const user = await User.findById(req.user._id)
@@ -601,20 +596,16 @@ var keyword="";
 app.post("/search/:page", async(req, res) => {
 
   keyword = req.body.keyword;
-  console.log("keyword: "+keyword);
   
   var limit = 3;
   var page = req.params.page
-  console.log("page:"+page);
   var skip = (page - 1)* limit;
-  console.log("skip: "+skip)
 
   docs = await  Document.find({$or:[{"university":{ $regex : new RegExp(keyword, "i") }},
                       {"course": { $regex : new RegExp(keyword, "i") }},
                       {"title": { $regex : new RegExp(keyword, "i") }},
                       {"topic": { $regex : new RegExp(keyword, "i") }}
                       ]});
-  console.log("docs: "+docs);
 
   var num_of_docs = docs.length;
   var number_of_pages = Math.ceil(num_of_docs / limit)
@@ -622,7 +613,6 @@ app.post("/search/:page", async(req, res) => {
   
 
   docs =  docs.slice(skip,(skip+limit));
-  console.log(docs);
 
   if(req.user) {
     const user = await User.findById(req.user._id)
@@ -647,9 +637,6 @@ app.post("/search/:page", async(req, res) => {
 });
 
 app.get("/search/:page", async(req, res) => {
-
- 
-  console.log("keyword: "+keyword);
   
   var limit = 3;
   var page = req.params.page
@@ -1016,6 +1003,14 @@ app.delete('/single_material/:document_id', isLoggedIn, isUploader, async(req, r
       }
     })    
   }
+
+  let user = await User.findById(doc.uploader.id)
+  user.uploads--;
+  if(doc.category=="notes_uploads") user.notes_uploads--
+  else if(doc.category=="assignments_uploads") user.assignments_uploads--
+  else user.papers_uploads--
+  user.save()
+ 
   let stat = await Stat.findOne({id:1})
   stat.totalDocuments--
   stat.save()
@@ -1063,7 +1058,7 @@ app.post("/register", async (req, res) => {
       const link=`http://localhost:3000/verify-email/?token=${user.usernameToken}`;
       req.flash("success","You are now registered! Please verify your account through mail.")
       console.log(link);          
-      sendverifyMail(username,link).then(result=>console.log("Email sent....",result));
+      // sendverifyMail(username,link).then(result=>console.log("Email sent....",result));
       res.redirect("/signup");
       let stat = await Stat.findOne({id:1})
       stat.totalUsers++
