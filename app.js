@@ -28,6 +28,16 @@ const { v1: uuidv1 } = require('uuid');
 const methodOverride = require('method-override');
 const fs = require("fs");
 const crypto=require("crypto");
+const user = require("./models/user.js");
+//var id = '608811b26b688b2430750380';
+//User.findByIdAndDelete(id, function (err, docs) {
+ // if (err){
+   //   console.log(err)
+ // }
+  //else{
+      //console.log("Deleted : ", docs);
+ // }
+//});
 
 //====================DATABASE CONNECTION==========================
 const db = process.env.MY_MONGODB_URI;
@@ -1092,10 +1102,10 @@ app.post("/login",isVerified, isNotBanned,(req, res, next) => {
   })(req, res, next);
 });
 
-// User.findById("608021176699a418a81b2eb2", function(err, user) {
-//   user.isAdmin = true
-//   user.save()
-// })
+//User.findById("608021176699a418a81b2eb2", function(err, user) {
+  //user.isAdmin = false
+     //user.save()
+ //})
 
 //Logout
 app.get("/logout", (req, res) => {
