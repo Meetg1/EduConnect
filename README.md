@@ -30,8 +30,10 @@ https://github.com/Meetg1/EduConnect.git
 ```
 npm install
 ```
-3. Database Installation
+3. Database
+Start MongoDB service with 
 ```
+mongod
 ```
 
 ## Features of EduConnect
