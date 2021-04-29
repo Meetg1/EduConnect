@@ -15,6 +15,8 @@ Edu-Cate With Edu-Connect - Its time to educate yourself with EduConnnect! Come 
 <img src="https://img.shields.io/badge/npm-CB3837?style=for-the-badge&logo=npm&logoColor=white">
 ### Database
 <img src="https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white">
+### File Storage
+<img src="https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white">
 
 ## Prerequirements
 - [MongoDB](https://www.mongodb.com/)
@@ -34,7 +36,7 @@ npm install
 ```
 mongod
 ``` 
-4 You can now run the client on your localhost
+4. You can now run the client on your localhost
 ```
 node app.js
 ```
@@ -42,7 +44,7 @@ node app.js
 
 ## Features of EduConnect
   1. User register and log in
-  2. Uploading notes/presentation/project
+  2. Uploading study material such as notes/question-papers/assignments
   3. Segregation of documents according to subjects, course, category and university.
   4. Rating/points to be given for people uploading documents.
   5. Reporting an invalid document  
