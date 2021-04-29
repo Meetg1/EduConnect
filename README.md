@@ -30,11 +30,15 @@ https://github.com/Meetg1/EduConnect.git
 ```
 npm install
 ```
-3. Database
-Start MongoDB service with 
+3. Start MongoDB service with
 ```
 mongod
+``` 
+4 You can now run the client on your localhost
 ```
+node app.js
+```
+
 
 ## Features of EduConnect
   1. User register and log in
