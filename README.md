@@ -1,7 +1,7 @@
 # EduConnect
 Online notes portal
 ## About EduConnect
-About us
+Edu-Cate With Edu-Connect - Its time to educate yourself with EduConnnect! Come onboard, as we, a team of three, will be providing you'll a platform to learn, unlearn, nleash and get your hands on the best resources completely for free
 ## Team Members
 1. [Meet Gajra - 1911011](https://github.com/Meetg1/)
 2. [Shubh Gangar - 1911013](https://github.com/shubh1605/)
@@ -41,8 +41,12 @@ https://github.com/Meetg1/EduConnect.git
   10. Authority to admin such as to view stats and delete/report documents
 
 ## Screenshots of our project
-  
- 
+  ![image](https://user-images.githubusercontent.com/62873923/116529850-fe7fa280-a8fa-11eb-85a5-b0ee9b20edb7.png)
+  ![image](https://user-images.githubusercontent.com/62873923/116530081-3edf2080-a8fb-11eb-86a5-e88506abd061.png)
+  ![image](https://user-images.githubusercontent.com/62873923/116530478-b7de7800-a8fb-11eb-881b-ae839bc9cb48.png)
+  ![image](https://user-images.githubusercontent.com/62873923/116530570-d04e9280-a8fb-11eb-8914-6d29c171c1f8.png)
+  ![image](https://user-images.githubusercontent.com/62873923/116530689-ef4d2480-a8fb-11eb-9755-864ff51b7a1f.png)
+  ![image](https://user-images.githubusercontent.com/62873923/116530799-0db32000-a8fc-11eb-8586-3220047a78af.png)
 
 
 
