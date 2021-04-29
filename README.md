@@ -16,6 +16,11 @@ Edu-Cate With Edu-Connect - Its time to educate yourself with EduConnnect! Come 
 ### Database
 <img src="https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white">
 
+## Prerequirements
+- [MongoDB](https://www.mongodb.com/)
+- [Node](https://nodejs.org/en/download/) 
+- [npm](https://nodejs.org/en/download/package-manager/)
+
 ## Instructions to run it on your PC.
 1. Cloning the repository - Clone the repository where you want to save this project
 ```
