@@ -505,7 +505,7 @@ app.post("/upload", isLoggedIn, async (req, res) => {
       // console.log(uploadedDoc);
       const foundUser = await User.findById(req.user._id).populate('followers').exec();
       foundUser.uploads = foundUser.uploads + 1;
-      foundUser.points = foundUser.points + 20;
+      foundUser.points = foundUser.points + 60;
       if (doc.category == "Lecture Notes") {
         foundUser.notes_uploads++;
       } else if (doc.category == "Question Paper") {
@@ -517,7 +517,7 @@ app.post("/upload", isLoggedIn, async (req, res) => {
       previewPicIds=[];
       let stat = await Stat.findOne({id:1})
       stat.totalDocuments++;
-      stat.pointsEarned+=20  
+      stat.pointsEarned+=60  
       stat.save()
 
       //creating the notification body
