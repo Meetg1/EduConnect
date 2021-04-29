@@ -21,8 +21,9 @@ Edu-Cate With Edu-Connect - Its time to educate yourself with EduConnnect! Come 
 ```
 https://github.com/Meetg1/EduConnect.git
 ```
-2. NPM installation 
+2. Install dependencies
 ```
+npm install
 ```
 3. Database Installation
 ```
