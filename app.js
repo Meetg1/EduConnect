@@ -1092,7 +1092,7 @@ app.post("/login",isVerified, isNotBanned,(req, res, next) => {
   })(req, res, next);
 });
 
-// User.findById("608021176699a418a81b2eb2", function(err, user) {
+// User.findById("6090fc1304d9b41090f84eb9", function(err, user) {
 //   user.isAdmin = true
 //   user.save()
 // })
@@ -1248,7 +1248,7 @@ app.get('/notification/:notificationId', isLoggedIn, async(req, res) => {
   }  
 });
 
- //Stat.create({id:1})
+//  Stat.create({id:1})
 
 
 app.get('/admin/statistics', isAdmin,async(req,res)=>{
